@@ -1,11 +1,73 @@
-import pick, ctypes, sys, os#, webbrowser 
+import pick, ctypes, sys, os
 from msvcrt import getch as getkey
+from termcolor import colored
+from click import clear
+
+os.system('color')
 
 def leave():
     exit();
 
 def settings():
-    getkey();
+    def provider():
+        global provider
+        title = 'Choose Provider: '
+        options = ['animixplay', 'haho (NSFW)', 'gogoanime', 'tenshi', 'animepahe','allanime', 'Exit']
+        indicator = 'Provider -> •'
+        option, index = pick.pick(options, title, indicator)
+        amogus = index
+
+        if amogus == 0:
+            provider = 'animixplay'
+            print("The provider has been set to", provider)
+            getkey();
+        elif amogus == 1:
+            provider = 'haho'
+            print("The provider has been set to", provider)
+            getkey();
+        elif amogus == 2:
+            provider = 'gogoanime'
+            print("The provider has been set to", provider)
+            getkey();
+        elif amogus == 3:
+            provider = 'tenshi'
+            print("The provider has been set to", provider)
+            getkey();
+        elif amogus == 4:
+            provider = 'animepahe'
+            print("The provider has been set to", provider)
+            getkey();
+        elif amogus == 5:
+            provider = 'allanime'
+            print("The provider has been set to\""+provider+"\"")
+            getkey();
+        else:
+            settings();
+        getkey();
+    def quality():
+        getkey();
+    def range():
+        getkey();
+    def directory():
+        getkey();
+    def leave():
+        menu();
+    title = 'Settings: '
+    options = ['Provider', 'Quality', 'Range', 'Directory', 'Exit']
+    indicator = '•'
+    option, index = pick.pick(options, title, indicator)
+    amogus = index
+
+    if amogus == 0:
+        provider();
+    elif amogus == 1:
+        quality();
+    elif amogus == 2:
+        range();
+    elif amogus == 3:
+        directory();
+    else:
+        leave();
 
 def update():
     def is_admin():
@@ -38,8 +100,8 @@ def download():
 
 def menu():
     title = 'What do you want to do?: '
-    options = ['Download', 'Grab', 'Schedule', 'Search', 'Stream', 'Update', 'Settings', 'Exit']
-    indicator = '•'
+    options = ['[1.] Download', '[2.] Grab', '[3.] Schedule', '[4.] Search', '[5.] Stream', '[6.] Update', '[7.]Settings', '[8.] Exit']
+    indicator = 'Main Menu -> •'
     option, index = pick.pick(options, title, indicator)
     amogus = index
 
@@ -60,8 +122,6 @@ def menu():
     else:
         leave();
 
-
-
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
@@ -81,4 +141,5 @@ if is_admin():
         else:
             menu();
 
-menu();
+if __name__ == '__main__':
+    menu();
