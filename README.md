@@ -26,3 +26,7 @@ Build in the cloned repository: <br>
 - Python 3.10 (probably)
 - Windows (as of right now)
 - [animdl](https://github.com/justfoolingaround/animdl)
+
+
+### License
+<a target="_blank" href="https://github.com/H4rldev/animdl-tui/blob/main/LICENSE" title="License"><img src="https://img.shields.io/github/license/h4rldev/animdl-tui?style=flat-square"></a>
