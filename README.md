@@ -1,7 +1,7 @@
 # animdl-tui
 A Graphical User Interface in the Terminal for [animdl](https://github.com/justfoolingaround/animdl)
 
-(heck, I had to fork a library and make it better for this)
+*(heck, I had to fork a library and make it better for this)*
 
 ## Installation:
 Get it from the [releases](https://github.com/H4rldev/animdl-tui/releases). <br>
