@@ -6,8 +6,8 @@ A Graphical User Interface in the Terminal for [animdl](https://github.com/justf
 ## Installation:
 Get it from the [releases](https://github.com/H4rldev/animdl-tui/releases). <br>
 Put it somewhere memorable. <br>
-Add it to your path.
-type (executable name) in terminal
+Add it to your path. <br>
+type (executable name) in terminal <br>
 profit??
 
 ## Build/running latest:
