@@ -10,6 +10,8 @@ Add it to your path. <br>
 type (executable name) in terminal <br>
 profit??
 
+*(will have some graphical bugs which i likely wont be able to fix unless a python wizard adds a PR to [bullet-fork](https://github.com/h4rldev/bullet-fork))*
+
 ## Build/running latest:
 From the command line
 
