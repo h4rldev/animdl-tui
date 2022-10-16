@@ -1,33 +1,88 @@
-import ctypes, sys, platform, os
+import sys, platform, os, ctypes, cursor
 from colored import fg, attr
-from bullet import Bullet, Check, YesNo, Input, Date, CheckDependencies, Password, ScrollBar
+from bullet import Bullet, colors, Check
 from msvcrt import getch as getkey
 from click import clear
 
-blue = fg("blue")
+cyan = fg("cyan")
 reset = attr("reset")
+bold = attr("bold")
 
-animdl1 = " ___  _ _  _  __ _        __   _"
-animdl2 = "| . || \ || ||  \ \  ___ | . \| |"
-animdl3 = "|   ||   || ||     ||___|| | || |_"
-animdl4 = "|_|_||_\_||_||_|_|_|     |___/|___|"
+animdl1 = " ___  _ _  _  _  _   __   _"
+animdl2 = "| . || \ || ||  \ \ | . \| |"
+animdl3 = "|   ||   || ||     || | || |_"
+animdl4 = "|_|_||_\_||_||_|_|_||___/|___|"
+animdl5 = "=============================="
 
 def continue1():
     print("\n Press any key to continue");
     getkey();
 
 def main():
+    cursor.hide();
     def leave():
         os.system("exit");
 
+    def toggle():
+        Check(checked=True)
+
     def settings():
-        print("yes")
+        print("%s%s%s\n%s\n%s\n%s\n%s\n%s" % (bold, cyan, animdl1, animdl2, animdl3, animdl4, animdl5, reset));
+        settings = Bullet(
+            prompt = "%s        -Settings:- %s \n" % (bold, reset),
+            choices = [
+                '- Toggle   -'
+                '- Provider -'
+                '- Player   -'
+                '- Quality  -'
+                '- Range    -'
+                '- Special  -'
+                '- Exit     -'
+            ],
+            bullet = "",
+            margin = 0,
+            align = 8,
+            word_on_switch=colors.foreground["white"],
+            background_on_switch=colors.background["cyan"]
+        )
+        result = settings.launch()
+        match result:
+            case '- Download -':
+                clear();
+                download();
+            case '- Stream   -':
+                clear();
+                stream();
+            case '- Search   -':
+                clear();
+                search();
+            case '- Schedule -':
+                clear();
+                schedule();
+            case '- Grab     -':
+                clear();
+                grab();
+            case "6. Update":
+                clear();
+                update();
+            case "7. Settings":
+                clear();
+                settings();
+            case "8. Exit":
+                clear();
+                leave();
 
     def update():
         match platform.system:
             case 'Windows':
+                def is_admin():
+                    try:
+                        return ctypes.windll.shell32.IsUserAnAdmin()
+                    except:
+                        return False
                 if is_admin():
                     os.system("animdl update")
+                    os.system("pause")
 
                 else:
                     # Re-run the program with admin rights
@@ -59,41 +114,44 @@ def main():
         getkey();
 
     def menu():
-        print(blue, animdl1, reset)
-        print(blue, animdl2, reset)
-        print(blue, animdl3, reset)
-        print(blue, animdl4, reset, "\n")
+        cursor.hide();
+        print("%s%s%s\n%s\n%s\n%s\n%s\n%s" % (bold, cyan, animdl1, animdl2, animdl3, animdl4, animdl5, reset));
         menu = Bullet(
-            bullet = ">> ",
-            prompt = "Choose Action:",
+            prompt = "%s        -Main Menu:- %s \n" % (bold, reset),
             choices = [
-                '1. Download',
-                '2. Grab',
-                '3. Schedule',
-                '4. Search',
-                '5. Stream',
-                '6. Update',
-                '7. Settings',
-                '8. Exit'
-            ])
+                '- Download -',
+                '- Stream   -',
+                '- Search   -',
+                '- Schedule -',
+                '- Grab     -',
+                '- Update   -',
+                '- Settings -',
+                '- Exit     -'
+            ],
+            bullet = "",
+            margin = 0,
+            align = 8,
+            word_on_switch=colors.foreground["white"],
+            background_on_switch=colors.background["cyan"]
+        )
 
         result = menu.launch()
         match result:
-            case "1. Download":
+            case '- Download -':
                 clear();
                 download();
-            case "2. Grab":
-                clear();
-                grab();
-            case "3. Schedule":
-                clear();
-                schedule();
-            case "4. Search":
-                clear();
-                search();
-            case "5. Stream":
+            case '- Stream   -':
                 clear();
                 stream();
+            case '- Search   -':
+                clear();
+                search();
+            case '- Schedule -':
+                clear();
+                schedule();
+            case '- Grab     -':
+                clear();
+                grab();
             case "6. Update":
                 clear();
                 update();
@@ -116,6 +174,7 @@ def is_admin():
 
 if is_admin():
     os.system("animdl update");
+    os.system("pause");
     exit();
 
 if __name__ == '__main__':
