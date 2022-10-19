@@ -15,13 +15,13 @@ _(will have some graphical bugs which i likely wont be able to fix unless a pyth
 
 ## Build/running latest
 
-### From the command line
+From the command line
 
-#### Run in the cloned repository
+Run in the cloned repository
 
 `python main.py`
 
-#### Build in the cloned repository
+Build in the cloned repository
 
 `pyinstaller --onefile main.py`
 
