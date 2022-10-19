@@ -11,17 +11,18 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 3. Add it to your path.
 4. Type (executable name) in terminal
 5. profit??
+
 _(will have some graphical bugs which i likely wont be able to fix unless a python wizard adds a PR to [bullet-fork](https://github.com/h4rldev/bullet-fork))_
 
 ## Build/running latest
 
 From the command line
 
-Run in the cloned repository
+Run in the cloned repository:
 
 `python main.py`
 
-Build in the cloned repository
+Build in the cloned repository:
 
 `pyinstaller --onefile main.py`
 
