@@ -1,4 +1,4 @@
-# animdl-tui
+# animdl-tui (NOT WORKING YET)
 
 A Terminal User Interface for [animdl](https://github.com/justfoolingaround/animdl)
 
