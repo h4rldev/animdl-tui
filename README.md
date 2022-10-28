@@ -1,5 +1,5 @@
-# animdl-tui (DOES NOTHING AT THE MOMENT)
 
+<<<<<<< HEAD
 A Terminal User Interface for [animdl](https://github.com/justfoolingaround/animdl)
 
 (_heck, I had to fork a library and make it better for this_)
@@ -49,3 +49,5 @@ Build in the cloned repository:
 ### License
 
 [![License](https://img.shields.io/github/license/h4rldev/animdl-tui?style=flat-square)](https://github.com/H4rldev/animdl-tui/blob/main/LICENSE)
+=======
+>>>>>>> 360baf21abf1f7a368877c2342e6bc1b1afaef8c
