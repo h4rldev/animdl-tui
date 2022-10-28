@@ -4,10 +4,6 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 
 (_heck, I had to fork a library and make it better for this_)
 
-<<<<<<< HEAD
-*(will have some graphical bugs which i likely wont be able to fix unless a python wizard adds a PR to [rebullet](https://github.com/h4rldev/rebullet))*
-=======
-
 ## Installation
 
 1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases)
@@ -15,8 +11,8 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 3. Put the directory in path.
 4. Execute the name of the executable in your terminal.
 5. Profit???
+
 ## Build/running latest
->>>>>>> 81e57ab7c6c60da5cbb1c2760be98c8c4b44239f
 
 From the command line
 
