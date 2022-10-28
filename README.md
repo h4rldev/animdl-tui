@@ -10,7 +10,7 @@ Add it to your path. <br>
 type (executable name) in terminal <br>
 profit??
 
-*(will have some graphical bugs which i likely wont be able to fix unless a python wizard adds a PR to [bullet-fork](https://github.com/h4rldev/bullet-fork))*
+*(will have some graphical bugs which i likely wont be able to fix unless a python wizard adds a PR to [rebullet](https://github.com/h4rldev/rebullet))*
 
 ## Build/running latest:
 From the command line
@@ -25,7 +25,9 @@ Build in the cloned repository: <br>
 - Python 3.10
 - Windows (as of right now)
 - [animdl](https://github.com/justfoolingaround/animdl)
-- [bullet-fork](https://github.com/H4rldev/bullet-fork) and dependencies.
+- [colored](https://pypi.org/project/colored/)
+- [click](https://pypi.org/project/click/)
+- [rebullet](https://pypi.org/project/rebullet) and dependencies.
 - [pyinstaller](https://pyinstaller.org/en/stable/) (if you want to build from source)
 
 ## Requirements (running):
