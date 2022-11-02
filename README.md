@@ -6,7 +6,7 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 
 ## Installation
 
-1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases)
+1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases) (currently empty due to it not even having a working release atm due to me not even implementing it yet)
 2. Put the executable in a directory.
 3. Put the directory in path.
 4. Execute the name of the executable in your terminal.
