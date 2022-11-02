@@ -4,8 +4,6 @@ from bullet import Bullet, colors
 from msvcrt import getch as getkey
 from click import clear
 from configparser import ConfigParser
-global config
-global file
 file = "animdl-tui\\config.ini"
 config = ConfigParser()
 config.read(file)
@@ -72,16 +70,16 @@ def main():
             qualitystatuscolor = red
         else:
             qualitystatuscolor = green
-        print("%s%s%s\n%s\n%s\n%s\n%s\n%s" % (bold, cyan, animdl1, animdl2, animdl3, animdl4, animdl5, reset));
+        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
 
-        print("           +-----------------------+")
-        print("           | PROVIDER      =", providerstatuscolor, "\b{:5}".format(config['toggles']['provider']), reset, "\b|")
-        print("           | QUALITY       =", qualitystatuscolor, "\b{:5}".format(config['toggles']['quality']), reset, "\b|")
-        print("           | RANGE         =", rangestatuscolor, "\b{:5}".format(config['toggles']['range']), reset, "\b|")
-        print("           | SPECIAL RANGE =", specialstatuscolor, "\b{:5}".format(config['toggles']['special']), reset, "\b|")
-        print("           +-----------------------+")
+        print(f"           +-----------------------+")
+        print(f"           | PROVIDER      ={providerstatuscolor} {config['toggles']['provider']:5} {reset}|")
+        print(f"           | QUALITY       ={qualitystatuscolor} {config['toggles']['quality']:5} {reset}|")
+        print(f"           | RANGE         ={rangestatuscolor} {config['toggles']['range']:5} {reset}|")
+        print(f"           | SPECIAL RANGE ={specialstatuscolor} {config['toggles']['special']:5} {reset}|")
+        print(f"           +-----------------------+")
         modules = Bullet(
-            prompt = "%s                 Enable modules: %s \n" % (bold, reset),
+            prompt = f"{bold}                 Enable modules: {reset} \n",
             choices = [
                 "Provider",
                 "Quality",
@@ -155,9 +153,9 @@ def main():
 
     def settings():
         clear();
-        print("%s%s%s\n%s\n%s\n%s\n%s\n%s" % (bold, cyan, animdl1, animdl2, animdl3, animdl4, animdl5, reset));
+        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
         settings = Bullet(
-            prompt = "%s                     Settings:  %s \n" % (bold, reset),
+            prompt = f"{bold}                     Settings:  {reset} \n",
             choices = [
                 '- Toggle   -',
                 '- Provider -',
@@ -240,7 +238,7 @@ def main():
 
     def menu():
         cursor.hide();
-        print("%s%s%s\n%s\n%s\n%s\n%s\n%s" % (bold, cyan, animdl1, animdl2, animdl3, animdl4, animdl5, reset));
+        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
         menu = Bullet(
             prompt = "%s                     Main Menu:  %s \n" % (bold, reset),
             choices = [
