@@ -57,7 +57,7 @@ def main():
 
             special_range_input_result = special_range_input.launch()
             if config['toggles']['special'] == 'True':
-                print(f"The PROVIDER MODULE is now {special_range_input_result}")
+                print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
                 config.set('modifiers', 'special', f'"{special_range_input_result}"')
                 with open(file, 'w') as configfile:
                     config.write(configfile)
@@ -85,6 +85,13 @@ def main():
                     config.set('toggles', 'special', 'True')
                     with open(file, 'w') as configfile:
                         config.write(configfile)
+                    print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
+                    config.set('modifiers', 'special', f'"{special_range_input_result}"')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    settings();
                 else:
                     clear();
                     print("Ok! returning...")
@@ -95,10 +102,142 @@ def main():
             settings();
 
     def range():
-        print(-1)
+        file = "config.ini"
+        config = ConfigParser()
+        config.read(file)
+        randomnumber = random.randint(0, 1000)
+        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+        specific_range = Bullet(
+            prompt=f"{bold}         Are you sure you want a specific range? {reset} \n",
+            choices=[
+                f"- {green}YES {colors.foreground['default']}-",
+                f"- {red}NO  {colors.foreground['default']}-",
+            ],
+            bullet="",
+            margin = 0,
+            align = 22,
+            word_on_switch=colors.foreground["white"],
+            background_on_switch=colors.background["cyan"]
+        )
+        result = specific_range.launch()
+        if result == f"- {green}YES {colors.foreground['default']}-":
+            clear();
+            print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+            specific_range_input = Input(
+                prompt=f"{bold}     Specify a range. (Example: \"{randomnumber}-{randomnumber}\") \n\n        : ",
+                word_color=colors.foreground['cyan'],
+            )
+
+            specific_range_input_result = specific_range_input.launch()
+            if config['toggles']['range'] == 'True':
+                print(f"The RANGE MODULE is now {specific_range_input_result}")
+                config.set('modifiers', 'range', f'"{specific_range_input_result}"')
+                with open(file, 'w') as configfile:
+                    config.write(configfile)
+                sleep(1)
+                clear();
+                settings();
+
+            else:
+                print(f"The RANGE MODULE is FALSE")
+                specific_range_toggle = Bullet(
+                    prompt=f"{bold}        Would you like to enable the RANGE MODULE? {reset} \n",
+                    choices=[
+                        f"- {green}YES {colors.foreground['default']}-",
+                        f"- {red}NO  {colors.foreground['default']}-",
+                    ],
+                    bullet="",
+                    margin = 0,
+                    align = 22,
+                    word_on_switch=colors.foreground["white"],
+                    background_on_switch=colors.background["cyan"]
+                )
+                specific_range_toggle_result = specific_range_toggle.launch()
+                if specific_range_toggle_result == f"- {green}YES {colors.foreground['default']}-":
+                    print("The RANGE MODULE is now True")
+                    config.set('toggles', 'range', 'True')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    print(f"The RANGE MODULE is now {specific_range_input_result}")
+                    config.set('modifiers', 'range', f'"{specific_range_input_result}"')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    settings();
+                else:
+                    clear();
+                    print("Ok! returning...")
+                    settings();
 
     def quality():
-        print(-1)
+        file = "config.ini"
+        config = ConfigParser()
+        config.read(file)
+        randomnumber = random.randint(0, 1000)
+        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+        quality = Bullet(
+            prompt=f"{bold}         Are you sure you want a specific quality? {reset} \n",
+            choices=[
+                f"- {green}YES {colors.foreground['default']}-",
+                f"- {red}NO  {colors.foreground['default']}-",
+            ],
+            bullet="",
+            margin = 0,
+            align = 22,
+            word_on_switch=colors.foreground["white"],
+            background_on_switch=colors.background["cyan"]
+        )
+        result = quality.launch()
+        if result == f"- {green}YES {colors.foreground['default']}-":
+            clear();
+            print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+            quality_input = Input(
+                prompt=f"{bold}     Specify a quality. (Examples: \"1080/best\", \"1080/worst\", \"best[title]\", \"best[title=r'^DUB']\") \n\n        : ",
+                word_color=colors.foreground['cyan']
+            )
+
+            quality_input_result = quality_input.launch()
+            if config['toggles']['range'] == 'True':
+                print(f"The QUALITY MODULE is now {quality_input_result}")
+                config.set('modifiers', 'quality', f'"{quality_input_result}"')
+                with open(file, 'w') as configfile:
+                    config.write(configfile)
+                sleep(1)
+                clear();
+                settings();
+
+            else:
+                print(f"The QUALITY MODULE is FALSE")
+                quality_toggle = Bullet(
+                    prompt=f"{bold}        Would you like to enable the QUALITY MODULE? {reset} \n",
+                    choices=[
+                        f"- {green}YES {colors.foreground['default']}-",
+                        f"- {red}NO  {colors.foreground['default']}-",
+                    ],
+                    bullet="",
+                    margin = 0,
+                    align = 22,
+                    word_on_switch=colors.foreground["white"],
+                    background_on_switch=colors.background["cyan"]
+                )
+                quality_toggle_result = quality_toggle.launch()
+                if quality_toggle_result == f"- {green}YES {colors.foreground['default']}-":
+                    print("The QUALITY MODULE is now True")
+                    config.set('toggles', 'quality', 'True')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    print(f"The QUALITY MODULE is now {quality_input_result}")
+                    config.set('modifiers', 'quality', f'"{quality_input_result}"')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    settings();
+                else:
+                    clear();
+                    print("Ok! returning...")
+                    settings();
 
     def player():
         print(-1)
