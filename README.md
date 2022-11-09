@@ -6,6 +6,8 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 
 (_heck, I had to fork a library and make it better for this_)
 
+(__I WON'T ADD FUZZYFINDER FOR THIS BECAUSE TWIST.MOE IS RANCID__)
+
 ## Installation
 
 1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases) (currently empty due to it not even having a working release atm due to me not even implementing it yet)

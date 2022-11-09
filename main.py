@@ -5,6 +5,7 @@ from bullet import Bullet, Input, colors
 from msvcrt import getch as getkey
 from click import clear
 from configparser import ConfigParser
+import yaml as y
 
 cyan = fg("cyan")
 reset = attr("reset")
@@ -36,8 +37,8 @@ def main():
         special_range = Bullet(
             prompt=f"{bold}         Are you sure you want a special range? {reset} \n",
             choices=[
-                f"- {green}YES {colors.foreground['default']}-",
-                f"- {red}NO  {colors.foreground['default']}-",
+                f'- {green}YES {colors.foreground["default"]}',
+                f'- {red}NO  {colors.foreground["default"]}',
             ],
             bullet="",
             margin = 0,
@@ -70,8 +71,8 @@ def main():
                 special_toggle = Bullet(
                     prompt=f"{bold}        Would you like to enable the SPECIAL RANGE MODULE? {reset} \n",
                     choices=[
-                        f"- {green}YES {colors.foreground['default']}-",
-                        f"- {red}NO  {colors.foreground['default']}-",
+                        f'- {green}YES {colors.foreground["default"]}',
+                        f'- {red}NO  {colors.foreground["default"]}',
                     ],
                     bullet="",
                     margin = 0,
@@ -110,8 +111,8 @@ def main():
         specific_range = Bullet(
             prompt=f"{bold}         Are you sure you want a specific range? {reset} \n",
             choices=[
-                f"- {green}YES {colors.foreground['default']}-",
-                f"- {red}NO  {colors.foreground['default']}-",
+                f'- {green}YES {colors.foreground["default"]}',
+                f'- {red}NO  {colors.foreground["default"]}',
             ],
             bullet="",
             margin = 0,
@@ -143,8 +144,8 @@ def main():
                 specific_range_toggle = Bullet(
                     prompt=f"{bold}        Would you like to enable the RANGE MODULE? {reset} \n",
                     choices=[
-                        f"- {green}YES {colors.foreground['default']}-",
-                        f"- {red}NO  {colors.foreground['default']}-",
+                        f'- {green}YES {colors.foreground["default"]}',
+                        f'- {red}NO  {colors.foreground["default"]}',
                     ],
                     bullet="",
                     margin = 0,
@@ -174,13 +175,12 @@ def main():
         file = "config.ini"
         config = ConfigParser()
         config.read(file)
-        randomnumber = random.randint(0, 1000)
         print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
         quality = Bullet(
             prompt=f"{bold}         Are you sure you want a specific quality? {reset} \n",
             choices=[
-                f"- {green}YES {colors.foreground['default']}-",
-                f"- {red}NO  {colors.foreground['default']}-",
+                f'- {green}YES {colors.foreground["default"]}',
+                f'- {red}NO  {colors.foreground["default"]}',
             ],
             bullet="",
             margin = 0,
@@ -198,7 +198,7 @@ def main():
             )
 
             quality_input_result = quality_input.launch()
-            if config['toggles']['range'] == 'True':
+            if config['toggles']['quality'] == 'True':
                 print(f"The QUALITY MODULE is now {quality_input_result}")
                 config.set('modifiers', 'quality', f'"{quality_input_result}"')
                 with open(file, 'w') as configfile:
@@ -212,8 +212,8 @@ def main():
                 quality_toggle = Bullet(
                     prompt=f"{bold}        Would you like to enable the QUALITY MODULE? {reset} \n",
                     choices=[
-                        f"- {green}YES {colors.foreground['default']}-",
-                        f"- {red}NO  {colors.foreground['default']}-",
+                        f'- {green}YES {colors.foreground["default"]}',
+                        f'- {red}NO  {colors.foreground["default"]}',
                     ],
                     bullet="",
                     margin = 0,
@@ -240,7 +240,40 @@ def main():
                     settings();
 
     def player():
-        print(-1)
+        file = "animdl_config.yml"
+        config = ConfigParser()
+        config.read(file)
+        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+        player = Bullet(
+            prompt=f"{bold}         Are you sure you want to switch to a different player? (default: mpv) {reset} \n",
+            choices=[
+                f'- {green}YES {colors.foreground["default"]}',
+                f'- {red}NO  {colors.foreground["default"]}',
+            ],
+            bullet="",
+            margin = 0,
+            align = 22,
+            word_on_switch=colors.foreground["white"],
+            background_on_switch=colors.background["cyan"]
+        )
+        result = player.launch()
+        if result == f"- {green}YES {colors.foreground['default']}-":
+            clear();
+            print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+            player_choice = Input(
+                prompt=f"{bold}     Choose a player. (Examples: \"1080/best\", \"1080/worst\", \"best[title]\", \"best[title=r'^DUB']\") \n\n        : ",
+                choices=[
+                    f'- mpv (default)',
+                    f'- vlc',
+                ],
+                bullet="",
+                margin = 0,
+                align = 22,
+                word_on_switch=colors.foreground["white"],
+                background_on_switch=colors.background["cyan"]
+            )
+
+            player_choice_result = player_choice.launch()
 
     def provider():
         print(-1)
@@ -282,11 +315,11 @@ def main():
         modules = Bullet(
             prompt = f"{bold}                     Toggle modules: {reset} \n",
             choices = [
-                "- Provider -",
-                "- Quality  -",
-                "- Range    -",
-                "- Special  -",
-                "- Exit     -"
+                '- Provider',
+                '- Quality ',
+                '- Range   ',
+                '- Special ',
+                '- Exit    '
             ],
             bullet = "",
             margin = 0,
@@ -296,7 +329,7 @@ def main():
         )
         result = modules.launch()
         match result:
-            case "- Provider -":
+            case '- Provider':
                 if config['toggles']['provider'] == 'True':
                     print("The PROVIDER MODULE is now False")
                     config.set('toggles', 'provider', 'False')
@@ -309,7 +342,7 @@ def main():
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     toggle();
-            case "- Quality  -":
+            case '- Quality ':
                 if config['toggles']['quality'] == 'True':
                     print("The QUALITY MODULE is now False")
                     config.set('toggles', 'quality', 'False')
@@ -322,7 +355,7 @@ def main():
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     toggle();
-            case "- Range    -":
+            case '- Range   ':
                 if config['toggles']['range'] == 'True':
                     print("The RANGE MODULE is now False")
                     config.set('toggles', 'range', 'False')
@@ -335,7 +368,7 @@ def main():
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     toggle();
-            case "- Special  -":
+            case '- Special ':
                 if config['toggles']['special'] == 'True':
                     print("The SPECIAL RANGE MODULE is now False")
                     config.set('toggles', 'special', 'False')
@@ -348,7 +381,7 @@ def main():
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     toggle();
-            case "- Exit     -":
+            case '- Exit    ':
                 clear();
                 settings();
 
@@ -358,13 +391,13 @@ def main():
         settings = Bullet(
             prompt = f"{bold}                       Settings:  {reset} \n",
             choices = [
-                '- Toggle   -',
-                '- Provider -',
-                '- Player   -',
-                '- Quality  -',
-                '- Range    -',
-                '- Special  -',
-                '- Exit     -'
+                '- Toggle  ',
+                '- Provider',
+                '- Player  ',
+                '- Quality ',
+                '- Range   ',
+                '- Special ',
+                '- Exit    '
             ],
             bullet = "",
             margin = 0,
@@ -374,25 +407,25 @@ def main():
         )
         result = settings.launch()
         match result:
-            case '- Toggle   -':
+            case '- Toggle  ':
                 clear();
                 toggle();
-            case '- Provider -':
+            case '- Provider':
                 clear();
                 provider();
-            case '- Player   -':
+            case '- Player  ':
                 clear();
                 player();
-            case '- Quality  -':
+            case '- Quality ':
                 clear();
                 quality();
-            case '- Range    -':
+            case '- Range   ':
                 clear();
                 range();
-            case "- Special  -":
+            case '- Special ':
                 clear();
                 special();
-            case "- Exit     -":
+            case '- Exit    ':
                 clear();
                 menu();
 
@@ -415,7 +448,7 @@ def main():
 
             case _:
                 print("I can't test this with anything but windows rn.",
-                "Run \'sudo animdl update to update.\'")
+                "Run \'sudo animdl update to update or whatever.\'")
                 exit();
 
     def stream():
@@ -449,14 +482,14 @@ def main():
         menu = Bullet(
             prompt = "%s                       Main Menu:  %s \n" % (bold, reset),
             choices = [
-                '- Download -',
-                '- Stream   -',
-                '- Search   -',
-                '- Schedule -',
-                '- Grab     -',
-                '- Update   -',
-                '- Settings -',
-                '- Exit     -'
+                '- Download',
+                '- Stream  ',
+                '- Search  ',
+                '- Schedule',
+                '- Grab    ',
+                '- Update  ',
+                '- Settings',
+                '- Exit    '
             ],
             bullet = "",
             margin = 0,
@@ -467,33 +500,33 @@ def main():
 
         result = menu.launch()
         match result:
-            case '- Download -':
+            case '- Download':
                 clear();
                 download();
-            case '- Stream   -':
+            case '- Stream  ':
                 clear();
                 stream();
-            case '- Search   -':
+            case '- Search  ':
                 clear();
                 search();
-            case '- Schedule -':
+            case '- Schedule':
                 clear();
                 schedule();
-            case '- Grab     -':
+            case '- Grab    ':
                 clear();
                 grab();
-            case "- Update   -":
+            case '- Update  ':
                 clear();
                 update();
-            case "- Settings -":
+            case '- Settings':
                 clear();
                 settings();
-            case "- Exit     -":
+            case '- Exit    ':
                 clear();
                 leave();
     menu();
 
 if __name__ == '__main__':
     clear();
-    ctypes.windll.kernel32.SetConsoleTitleW("animdl-TUI")
+    ctypes.windll.kernel32.SetConsoleTitleW("animdl-tui")
     main();
