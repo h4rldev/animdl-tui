@@ -1,0 +1,5 @@
+default_player: mpv
+players:
+  mpv:
+    executable: mpv
+    opts: []

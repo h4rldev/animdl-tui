@@ -24,10 +24,6 @@ def continue1():
     getkey();
 
 def main():
-    cursor.hide();
-    def leave():
-        os.system("exit");
-
     def special():
         file = "config.ini"
         config = ConfigParser()
@@ -51,7 +47,7 @@ def main():
             clear();
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
             special_range_input = Input(
-                prompt=f"{bold}     Specify a special range. (Example: \"latest-{randomnumber}\") \n\n        : ",
+                prompt=f"{bold}     Specify a special range. (Example: \"latest-{randomnumber}\"){reset} \n\n        : ",
                 word_color=colors.foreground['cyan'],
                 pattern="latest-"
             )
@@ -59,12 +55,12 @@ def main():
             special_range_input_result = special_range_input.launch()
             if config['toggles']['special'] == 'True':
                 print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
-                config.set('modifiers', 'special', f'"{special_range_input_result}"')
+                config.set('modifiers', 'special', f'{special_range_input_result}')
                 with open(file, 'w') as configfile:
                     config.write(configfile)
                 sleep(1)
                 clear();
-                settings();
+                thesettings();
 
             else:
                 print(f"The SPECIAL RANGE MODULE is FALSE")
@@ -81,26 +77,26 @@ def main():
                     background_on_switch=colors.background["cyan"]
                 )
                 special_toggle_result = special_toggle.launch()
-                if special_toggle_result == f"- {green}YES {colors.foreground['default']}-":
+                if special_toggle_result == f"- {green}YES {colors.foreground['default']}":
                     print("The SPECIAL RANGE MODULE is now True")
                     config.set('toggles', 'special', 'True')
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
-                    config.set('modifiers', 'special', f'"{special_range_input_result}"')
+                    config.set('modifiers', 'special', f'{special_range_input_result}')
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     sleep(1)
                     clear();
-                    settings();
+                    thesettings();
                 else:
                     clear();
                     print("Ok! returning...")
-                    settings();
+                    thesettings();
         else:
             clear();
             print("Ok! returning...")
-            settings();
+            thesettings();
 
     def range():
         file = "config.ini"
@@ -121,23 +117,23 @@ def main():
             background_on_switch=colors.background["cyan"]
         )
         result = specific_range.launch()
-        if result == f"- {green}YES {colors.foreground['default']}-":
+        if result == f"- {green}YES {colors.foreground['default']}":
             clear();
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
             specific_range_input = Input(
-                prompt=f"{bold}     Specify a range. (Example: \"{randomnumber}-{randomnumber}\") \n\n        : ",
+                prompt=f"{bold}     Specify a range. (Example: \"{randomnumber}-{randomnumber}\"){reset} \n\n        : ",
                 word_color=colors.foreground['cyan'],
             )
 
             specific_range_input_result = specific_range_input.launch()
             if config['toggles']['range'] == 'True':
                 print(f"The RANGE MODULE is now {specific_range_input_result}")
-                config.set('modifiers', 'range', f'"{specific_range_input_result}"')
+                config.set('modifiers', 'range', f'{specific_range_input_result}')
                 with open(file, 'w') as configfile:
                     config.write(configfile)
                 sleep(1)
                 clear();
-                settings();
+                thesettings();
 
             else:
                 print(f"The RANGE MODULE is FALSE")
@@ -154,22 +150,22 @@ def main():
                     background_on_switch=colors.background["cyan"]
                 )
                 specific_range_toggle_result = specific_range_toggle.launch()
-                if specific_range_toggle_result == f"- {green}YES {colors.foreground['default']}-":
+                if specific_range_toggle_result == f"- {green}YES {colors.foreground['default']}":
                     print("The RANGE MODULE is now True")
                     config.set('toggles', 'range', 'True')
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     print(f"The RANGE MODULE is now {specific_range_input_result}")
-                    config.set('modifiers', 'range', f'"{specific_range_input_result}"')
+                    config.set('modifiers', 'range', f'{specific_range_input_result}')
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     sleep(1)
                     clear();
-                    settings();
+                    thesettings();
                 else:
                     clear();
                     print("Ok! returning...")
-                    settings();
+                    thesettings();
 
     def quality():
         file = "config.ini"
@@ -189,23 +185,23 @@ def main():
             background_on_switch=colors.background["cyan"]
         )
         result = quality.launch()
-        if result == f"- {green}YES {colors.foreground['default']}-":
+        if result == f"- {green}YES {colors.foreground['default']}":
             clear();
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
             quality_input = Input(
-                prompt=f"{bold}     Specify a quality. (Examples: \"1080/best\", \"1080/worst\", \"best[title]\", \"best[title=r'^DUB']\") \n\n        : ",
+                prompt=f"{bold}     Specify a quality. (Examples: \"1080/best\", \"1080/worst\", \"best[title]\", \"best[title=r'^DUB']\"){reset} \n\n        : ",
                 word_color=colors.foreground['cyan']
             )
 
             quality_input_result = quality_input.launch()
             if config['toggles']['quality'] == 'True':
                 print(f"The QUALITY MODULE is now {quality_input_result}")
-                config.set('modifiers', 'quality', f'"{quality_input_result}"')
+                config.set('modifiers', 'quality', f'{quality_input_result}')
                 with open(file, 'w') as configfile:
                     config.write(configfile)
                 sleep(1)
                 clear();
-                settings();
+                thesettings();
 
             else:
                 print(f"The QUALITY MODULE is FALSE")
@@ -222,27 +218,25 @@ def main():
                     background_on_switch=colors.background["cyan"]
                 )
                 quality_toggle_result = quality_toggle.launch()
-                if quality_toggle_result == f"- {green}YES {colors.foreground['default']}-":
+                if quality_toggle_result == f"- {green}YES {colors.foreground['default']}":
                     print("The QUALITY MODULE is now True")
                     config.set('toggles', 'quality', 'True')
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     print(f"The QUALITY MODULE is now {quality_input_result}")
-                    config.set('modifiers', 'quality', f'"{quality_input_result}"')
+                    config.set('modifiers', 'quality', f'{quality_input_result}')
                     with open(file, 'w') as configfile:
                         config.write(configfile)
                     sleep(1)
                     clear();
-                    settings();
+                    thesettings();
                 else:
                     clear();
                     print("Ok! returning...")
-                    settings();
+                    thesettings();
 
     def player():
         file = "animdl_config.yml"
-        config = ConfigParser()
-        config.read(file)
         print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
         player = Bullet(
             prompt=f"{bold}         Are you sure you want to switch to a different player? (default: mpv) {reset} \n",
@@ -257,14 +251,16 @@ def main():
             background_on_switch=colors.background["cyan"]
         )
         result = player.launch()
-        if result == f"- {green}YES {colors.foreground['default']}-":
+        if result == f"- {green}YES {colors.foreground['default']}":
             clear();
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
-            player_choice = Input(
-                prompt=f"{bold}     Choose a player. (Examples: \"1080/best\", \"1080/worst\", \"best[title]\", \"best[title=r'^DUB']\") \n\n        : ",
+            player_choice = Bullet(
+                prompt=f"{bold}     Choose a player. {reset} \n",
                 choices=[
-                    f'- mpv (default)',
-                    f'- vlc',
+                    '- mpv (default)  ',
+                    '- vlc            ',
+                    '- ffplay (ffmpeg)',
+                    '- exit           '
                 ],
                 bullet="",
                 margin = 0,
@@ -272,11 +268,172 @@ def main():
                 word_on_switch=colors.foreground["white"],
                 background_on_switch=colors.background["cyan"]
             )
-
             player_choice_result = player_choice.launch()
 
+            match player_choice_result:
+                case '- mpv (default)  ':
+                    data = {
+                        "default_player": "mpv",
+                        "players": {
+                            "mpv": {
+                                "executable": "mpv",
+                                "opts": []
+                            }
+                        }
+                    }
+
+                    print("mpv should now be the selected player.")
+
+                    with open(file, 'w') as ymlconfig:
+                        y.dump(data, ymlconfig)
+                    sleep(1)
+                    thesettings();
+
+                case '- vlc            ':
+                    data = {
+                        "default_player": "vlc",
+                        "players": {
+                            "vlc": {
+                                "executable": "vlc",
+                                "opts": []
+                            }
+                        }
+                    }
+
+                    print("vlc should now be the selected player.")
+
+                    with open(file, 'w') as ymlconfig:
+                        y.dump(data, ymlconfig)
+                    sleep(1)
+                    thesettings();
+
+
+                case '- ffplay (ffmpeg)':
+                    data = {
+                        "default_player": "ffplay",
+                        "players": {
+                            "ffplay":{
+                                "executable": "ffplay",
+                                "opts": []
+                            }
+                        }
+                    }
+
+                    print("ffplay should now be the selected player.")
+
+                    with open(file, 'w') as ymlconfig:
+                        y.dump(data, ymlconfig)
+
+                    sleep(1)
+                    thesettings();
+
+                case '- exit           ':
+                    clear();
+                    thesettings();
+
+        else:
+            clear();
+            thesettings();
+
     def provider():
-        print(-1)
+        file = 'config.ini'
+        config = ConfigParser()
+        config.read(file)
+        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+        provider = Bullet(
+            prompt=f"{bold}         Are you sure you want to switch to a different provider? (default: animixplay) {reset} \n",
+            choices=[
+                f'- {green}YES {colors.foreground["default"]}',
+                f'- {red}NO  {colors.foreground["default"]}',
+            ],
+            bullet="",
+            margin = 0,
+            align = 22,
+            word_on_switch=colors.foreground["white"],
+            background_on_switch=colors.background["cyan"]
+        )
+        result = provider.launch()
+        if result == f"- {green}YES {colors.foreground['default']}":
+            clear();
+            print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+            provider_choice = Bullet(
+                prompt=f"{bold}     Choose a provider (sorted by latency). {reset} \n",
+                choices=[
+                    '- animixplay (default)',
+                    '- animepahe           ',
+                    '- haho (NSFW)         ',
+                    '- gogoanime           ',
+                    '- tenshi.moe          ',
+                    '- allanime            ',
+                    '- exit                '
+                ],
+                bullet="",
+                margin = 0,
+                align = 22,
+                word_on_switch=colors.foreground["white"],
+                background_on_switch=colors.background["cyan"]
+            )
+            provider_choice_result = provider_choice.launch()
+
+            match provider_choice_result:
+
+                case '- animixplay (default)':
+                    print("The provider has now been set to animixplay.")
+                    config.set('modifiers', 'provider', 'animixplay')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    thesettings();
+
+                case '- animepahe           ':
+                    print("The provider has now been set to animepahe.")
+                    config.set('modifiers', 'provider', 'animepahe')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    thesettings();
+
+                case '- haho (NSFW)         ':
+                    print("The provider has now been set to haho (NSFW).")
+                    config.set('modifiers', 'provider', 'haho')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    thesettings();
+
+                case '- gogoanime           ':
+                    print("The provider has now been set to gogoanime.")
+                    config.set('modifiers', 'provider', 'gogoanime')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    thesettings();
+
+                case '- tenshi.moe          ':
+                    print("The provider has now been set to tenshi.moe.")
+                    config.set('modifiers', 'provider', 'tenshi')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    thesettings();
+
+                case '- allanime            ':
+                    print("The provider has now been set to allanime.")
+                    config.set('modifiers', 'provider', 'allanime')
+                    with open(file, 'w') as configfile:
+                        config.write(configfile)
+                    sleep(1)
+                    clear();
+                    thesettings();
+
+                case '- exit                ':
+                    clear();
+                    thesettings();
 
     def toggle():
         clear();
@@ -330,7 +487,7 @@ def main():
         result = modules.launch()
         match result:
             case '- Provider':
-                if config['toggles']['provider'] == 'True':
+                if config['toggles']['provider'] == 'True': # planning to switch to yaml
                     print("The PROVIDER MODULE is now False")
                     config.set('toggles', 'provider', 'False')
                     with open(file, 'w') as configfile:
@@ -383,9 +540,9 @@ def main():
                     toggle();
             case '- Exit    ':
                 clear();
-                settings();
+                thesettings();
 
-    def settings():
+    def thesettings():
         clear();
         print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
         settings = Bullet(
@@ -473,6 +630,7 @@ def main():
                     return ctypes.windll.shell32.IsUserAnAdmin()
                 except:
                     return False
+
         cursor.hide();
         if is_admin():
             os.system("animdl update");
@@ -480,7 +638,7 @@ def main():
             clear();
         print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
         menu = Bullet(
-            prompt = "%s                       Main Menu:  %s \n" % (bold, reset),
+            prompt = f"{bold}                       Main Menu:  {reset} \n",
             choices = [
                 '- Download',
                 '- Stream  ',
@@ -489,6 +647,7 @@ def main():
                 '- Grab    ',
                 '- Update  ',
                 '- Settings',
+                '- Web     ',
                 '- Exit    '
             ],
             bullet = "",
@@ -499,6 +658,7 @@ def main():
         )
 
         result = menu.launch()
+
         match result:
             case '- Download':
                 clear();
@@ -520,10 +680,14 @@ def main():
                 update();
             case '- Settings':
                 clear();
-                settings();
+                thesettings();
+            case '- Web     ':
+                clear();
+                print("empty rn")
+                main();
             case '- Exit    ':
                 clear();
-                leave();
+                exit;
     menu();
 
 if __name__ == '__main__':
