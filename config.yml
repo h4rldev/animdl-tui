@@ -1,0 +1,11 @@
+modifiers:
+  provider: animepahe
+  quality: 1080/best
+  range: null
+  special: null
+toggles:
+  quality: true
+  range: true
+  special: true
+web:
+  web: false

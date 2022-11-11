@@ -8,6 +8,10 @@ from msvcrt import getch as getkey
 from click import clear
 from configparser import ConfigParser as config
 
+file = "config.yml"
+with open(file, 'r') as configfile:
+    tui_config = y.safe_load(configfile)
+
 
 cyan = fg("cyan")
 reset = attr("reset")
@@ -28,8 +32,6 @@ def continue1():
 def main():
     def thesettings():
         def special():
-            file = "config.ini"
-            config.read(file)
             randomnumber = random.randint(0, 1000)
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
             special_range = Bullet(
@@ -45,7 +47,7 @@ def main():
                 background_on_switch=colors.background["cyan"]
             )
             result = special_range.launch()
-            if result == f"- {green}YES {colors.foreground['default']}-":
+            if result == f"- {green}YES {colors.foreground['default']}":
                 clear();
                 print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
                 special_range_input = Input(
@@ -55,11 +57,11 @@ def main():
                 )
 
                 special_range_input_result = special_range_input.launch()
-                if config['toggles']['special'] == 'True':
+                if tui_config['toggles']['special'] == True:
                     print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
-                    config.set('modifiers', 'special', f'{special_range_input_result}')
+                    tui_config['modifiers']['special'] = f'{special_range_input_result}'
                     with open(file, 'w') as configfile:
-                        config.write(configfile)
+                        y.dump(tui_config, configfile)
                     sleep(1)
                     clear();
                     thesettings();
@@ -81,14 +83,13 @@ def main():
                     special_toggle_result = special_toggle.launch()
                     if special_toggle_result == f"- {green}YES {colors.foreground['default']}":
                         print("The SPECIAL RANGE MODULE is now True")
-                        config.set('toggles', 'special', 'True')
+                        tui_config['toggles']['special'] = True
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
-                        config.set('modifiers', 'special', f'{special_range_input_result}')
+                        tui_config['modifiers']['range'] = f'{special_range_input_result}'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
-                        sleep(1)
+                            y.dump(tui_config, configfile)
                         clear();
                         thesettings();
                     else:
@@ -101,8 +102,6 @@ def main():
                 thesettings();
 
         def therange():
-            file = "config.ini"
-            config.read(file)
             randomnumber = random.randint(0, 1000)
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
             specific_range = Bullet(
@@ -127,11 +126,11 @@ def main():
                 )
 
                 specific_range_input_result = specific_range_input.launch()
-                if config['toggles']['range'] == 'True':
+                if tui_config['toggles']['range'] == True:
                     print(f"The RANGE MODULE is now {specific_range_input_result}")
-                    config.set('modifiers', 'range', f'{specific_range_input_result}')
+                    tui_config['modifiers']['range'] = f'{specific_range_input_result}'
                     with open(file, 'w') as configfile:
-                        config.write(configfile)
+                        y.dump(tui_config, configfile)
                     sleep(1)
                     clear();
                     thesettings();
@@ -153,13 +152,13 @@ def main():
                     specific_range_toggle_result = specific_range_toggle.launch()
                     if specific_range_toggle_result == f"- {green}YES {colors.foreground['default']}":
                         print("The RANGE MODULE is now True")
-                        config.set('toggles', 'range', 'True')
+                        tui_config['toggles']['range'] = True
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         print(f"The RANGE MODULE is now {specific_range_input_result}")
-                        config.set('modifiers', 'range', f'{specific_range_input_result}')
+                        tui_config['toggles']['range'] = f'{specific_range_input_result}'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         sleep(1)
                         clear();
                         thesettings();
@@ -169,8 +168,6 @@ def main():
                         thesettings();
 
         def quality():
-            file = "config.ini"
-            config.read(file)
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
             quality = Bullet(
                 prompt=f"{bold}         Are you sure you want a specific quality? {reset} \n",
@@ -194,11 +191,11 @@ def main():
                 )
 
                 quality_input_result = quality_input.launch()
-                if config['toggles']['quality'] == 'True':
+                if tui_config['toggles']['quality'] == True:
                     print(f"The QUALITY MODULE is now {quality_input_result}")
-                    config.set('modifiers', 'quality', f'{quality_input_result}')
+                    tui_config['toggles']['quality'] = f'{quality_input_result}'
                     with open(file, 'w') as configfile:
-                        config.write(configfile)
+                        y.dump(tui_config, configfile)
                     sleep(1)
                     clear();
                     thesettings();
@@ -220,13 +217,13 @@ def main():
                     quality_toggle_result = quality_toggle.launch()
                     if quality_toggle_result == f"- {green}YES {colors.foreground['default']}":
                         print("The QUALITY MODULE is now True")
-                        config.set('toggles', 'quality', 'True')
+                        tui_config['toggles']['quality'] = True
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         print(f"The QUALITY MODULE is now {quality_input_result}")
-                        config.set('modifiers', 'quality', f'{quality_input_result}')
+                        tui_config['toggles']['quality'] = f'{quality_input_result}'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         sleep(1)
                         clear();
                         thesettings();
@@ -335,8 +332,6 @@ def main():
                 thesettings();
 
         def provider():
-            file = 'config.ini'
-            config.read(file)
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
             provider = Bullet(
                 prompt=f"{bold}         Are you sure you want to switch to a different provider? (default: animixplay) {reset} \n",
@@ -377,54 +372,54 @@ def main():
 
                     case '- animixplay (default)':
                         print("The provider has now been set to animixplay.")
-                        config.set('modifiers', 'provider', 'animixplay')
+                        tui_config['modifiers']['provider'] = 'animixplay'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         sleep(1)
                         clear();
                         thesettings();
 
                     case '- animepahe           ':
                         print("The provider has now been set to animepahe.")
-                        config.set('modifiers', 'provider', 'animepahe')
+                        tui_config['modifiers']['provider'] = 'animepahe'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         sleep(1)
                         clear();
                         thesettings();
 
                     case '- haho (NSFW)         ':
                         print("The provider has now been set to haho (NSFW).")
-                        config.set('modifiers', 'provider', 'haho')
+                        tui_config['modifiers']['provider'] = 'haho'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         sleep(1)
                         clear();
                         thesettings();
 
                     case '- gogoanime           ':
                         print("The provider has now been set to gogoanime.")
-                        config.set('modifiers', 'provider', 'gogoanime')
+                        tui_config['modifiers']['provider'] = 'gogoanime'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         sleep(1)
                         clear();
                         thesettings();
 
                     case '- tenshi.moe          ':
                         print("The provider has now been set to tenshi.moe.")
-                        config.set('modifiers', 'provider', 'tenshi')
+                        tui_config['modifiers']['provider'] = 'tenshi'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         sleep(1)
                         clear();
                         thesettings();
 
                     case '- allanime            ':
                         print("The provider has now been set to allanime.")
-                        config.set('modifiers', 'provider', 'allanime')
+                        tui_config['modifiers']['provider'] = 'allanime'
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         sleep(1)
                         clear();
                         thesettings();
@@ -435,30 +430,34 @@ def main():
 
         def toggle():
             clear();
-            file = "config.ini"
-            config.read(file)
 
-            if config['toggles']['special'] == 'False':
+            if tui_config['toggles']['special'] == False:
+                specialstatus = 'False'
                 specialstatuscolor = red
             else:
+                specialstatus = 'True'
                 specialstatuscolor = green
 
-            if config['toggles']['range'] == 'False':
+            if tui_config['toggles']['range'] == False:
+                rangestatus = 'False'
                 rangestatuscolor = red
             else:
+                rangestatus = 'True'
                 rangestatuscolor = green
 
-            if config['toggles']['quality'] == 'False':
+            if tui_config['toggles']['quality'] == False:
+                qualitystatus = 'False'
                 qualitystatuscolor = red
             else:
+                qualitystatus = 'True'
                 qualitystatuscolor = green
 
             print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
 
             print("               +-----------------------+")
-            print(f"               | QUALITY       ={qualitystatuscolor} {config['toggles']['quality']:5} {reset}|")
-            print(f"               | RANGE         ={rangestatuscolor} {config['toggles']['range']:5} {reset}|")
-            print(f"               | SPECIAL RANGE ={specialstatuscolor} {config['toggles']['special']:5} {reset}|")
+            print(f"               | QUALITY       ={qualitystatuscolor} {qualitystatus:5} {reset}|")
+            print(f"               | RANGE         ={rangestatuscolor} {rangestatus:5} {reset}|")
+            print(f"               | SPECIAL RANGE ={specialstatuscolor} {specialstatus:5} {reset}|")
             print("               +-----------------------+")
             modules = Bullet(
                 prompt = f"{bold}                     Toggle modules: {reset} \n",
@@ -477,43 +476,43 @@ def main():
             result = modules.launch()
             match result:
                 case '- Quality ':
-                    if config['toggles']['quality'] == 'True':
+                    if tui_config['toggles']['quality'] == True:
                         print("The QUALITY MODULE is now False")
-                        config.set('toggles', 'quality', 'False')
+                        tui_config['toggles']['quality'] = False
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         toggle();
                     else:
                         print("The QUALITY MODULE is now True")
-                        config.set('toggles', 'quality', 'True')
+                        tui_config['toggles']['quality'] = True
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         toggle();
                 case '- Range   ':
-                    if config['toggles']['range'] == 'True':
+                    if tui_config['toggles']['range'] == True:
                         print("The RANGE MODULE is now False")
-                        config.set('toggles', 'range', 'False')
+                        tui_config['toggles']['range'] = False
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         toggle();
                     else:
                         print("The RANGE MODULE is now True")
-                        config.set('toggles', 'range', 'True')
+                        tui_config['toggles']['range'] = True
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         toggle();
                 case '- Special ':
-                    if config['toggles']['special'] == 'True':
+                    if tui_config['toggles']['special'] == True:
                         print("The SPECIAL RANGE MODULE is now False")
-                        config.set('toggles', 'special', 'False')
+                        tui_config['toggles']['special'] = False
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         toggle();
                     else:
                         print("The SPECIAL RANGE MODULE is now True")
-                        config.set('toggles', 'special', 'True')
+                        tui_config['toggles']['special'] = True
                         with open(file, 'w') as configfile:
-                            config.write(configfile)
+                            y.dump(tui_config, configfile)
                         toggle();
                 case '- Exit    ':
                     clear();
