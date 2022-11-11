@@ -43,4 +43,4 @@ Build in the cloned repository:
 - Python 3.10 (probably)
 - Windows (as of right now)
 - [animdl](https://github.com/justfoolingaround/animdl)
-- probablt some other deps idk
+- probably some other deps (there's no working version yet so i'll figure this out later).
