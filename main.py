@@ -1,15 +1,19 @@
-import sys, platform, os, ctypes, cursor, random
-import yaml as y
-from flask import Flask, render_template
-from time import sleep
-from colored import fg, attr
-from bullet import Bullet, Input, colors
+import ctypes
+import os
+import random
+import sys
 from msvcrt import getch as getkey
-from click import clear
-from configparser import ConfigParser as config
+from time import sleep
 
-file = "config.yml"
-with open(file, 'r') as configfile:
+import cursor
+import yaml as y
+from bullet import Bullet, Input, colors
+from click import clear
+from colored import attr, fg
+from flask import Flask, render_template
+
+CONFIG_FILE = "config.yml"
+with open(CONFIG_FILE, 'r') as configfile:
     tui_config = y.safe_load(configfile)
 
 
@@ -19,87 +23,86 @@ bold = attr("bold")
 green = fg("green")
 red = fg("red")
 
-animdl1 = "    ___    _   ________  _______  __       ________  ______"
-animdl2 = "   /   |  / | / /  _/  |/  / __ \/ /      /_  __/ / / /  _/"
-animdl3 = "  / /| | /  |/ // // /|_/ / / / / /  ______/ / / / / // /  "
-animdl4 = " / ___ |/ /|  // // /  / / /_/ / /__/_____/ / / /_/ // /   "
-animdl5 = "/_/  |_/_/ |_/___/_/  /_/_____/_____/    /_/  \____/___/ "
+ANIMDL1 = "    ___    _   ________  _______  __       ________  ______"
+ANIMDL2 = "   /   |  / | / /  _/  |/  / __ \/ /      /_  __/ / / /  _/"
+ANIMDL3 = "  / /| | /  |/ // // /|_/ / / / / /  ______/ / / / / // /  "
+ANIMDL4 = " / ___ |/ /|  // // /  / / /_/ / /__/_____/ / / /_/ // /   "
+ANIMDL5 = "/_/  |_/_/ |_/___/_/  /_/_____/_____/    /_/  \____/___/ "
 
 def continue1():
-    print("\n Press any key to continue");
-    getkey();
+    print("\n Press any key to continue")
+    getkey()
 
-def main():
-    def thesettings():
-        def special():
-            randomnumber = random.randint(0, 1000)
-            print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
-            special_range = Bullet(
-                prompt=f"{bold}         Are you sure you want a special range? {reset} \n",
-                choices=[
-                    f'- {green}YES {colors.foreground["default"]}',
-                    f'- {red}NO  {colors.foreground["default"]}',
-                ],
-                bullet="",
-                margin = 0,
-                align = 22,
-                word_on_switch=colors.foreground["white"],
-                background_on_switch=colors.background["cyan"]
+def thesettings(settings):
+    def special(special_range):
+        randomnumber = random.randint(0, 1000)
+        print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}");
+        special_range = Bullet(
+            prompt=f"{bold}         Are you sure you want a special range? {reset} \n",
+            choices=[
+                f'- {green}YES {colors.foreground["default"]}',
+                f'- {red}NO  {colors.foreground["default"]}',
+            ],
+            bullet="",
+            margin = 0,
+            align = 22,
+            word_on_switch=colors.foreground["white"],
+            background_on_switch=colors.background["cyan"]
+        )
+        result = special_range.launch()
+        if result == f"- {green}YES {colors.foreground['default']}":
+            clear();
+            print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}");
+            special_range_input = Input(
+                prompt=f"{bold}     Specify a special range. (Example: \"latest-{randomnumber}\"){reset} \n\n        : ",
+                word_color=colors.foreground['cyan'],
+                pattern="latest-"
             )
-            result = special_range.launch()
-            if result == f"- {green}YES {colors.foreground['default']}":
-                clear();
-                print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
-                special_range_input = Input(
-                    prompt=f"{bold}     Specify a special range. (Example: \"latest-{randomnumber}\"){reset} \n\n        : ",
-                    word_color=colors.foreground['cyan'],
-                    pattern="latest-"
-                )
 
-                special_range_input_result = special_range_input.launch()
-                if tui_config['toggles']['special'] == True:
-                    print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
-                    tui_config['modifiers']['special'] = f'{special_range_input_result}'
-                    with open(file, 'w') as configfile:
-                        y.dump(tui_config, configfile)
+            special_range_input_result = special_range_input.launch()
+            if tui_config['toggles']['special'] is True:
+                print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
+                tui_config['modifiers']['special'] = f'{special_range_input_result}'
+                with open(CONFIG_FILE, 'w') as configfile:
+                    y.dump(tui_config, configfile)
                     sleep(1)
                     clear();
-                    thesettings();
+                    return
 
-                else:
-                    print(f"The SPECIAL RANGE MODULE is FALSE")
-                    special_toggle = Bullet(
-                        prompt=f"{bold}        Would you like to enable the SPECIAL RANGE MODULE? {reset} \n",
-                        choices=[
-                            f'- {green}YES {colors.foreground["default"]}',
-                            f'- {red}NO  {colors.foreground["default"]}',
-                        ],
-                        bullet="",
-                        margin = 0,
-                        align = 22,
-                        word_on_switch=colors.foreground["white"],
-                        background_on_switch=colors.background["cyan"]
-                    )
-                    special_toggle_result = special_toggle.launch()
-                    if special_toggle_result == f"- {green}YES {colors.foreground['default']}":
-                        print("The SPECIAL RANGE MODULE is now True")
-                        tui_config['toggles']['special'] = True
-                        with open(file, 'w') as configfile:
-                            y.dump(tui_config, configfile)
-                        print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
-                        tui_config['modifiers']['range'] = f'{special_range_input_result}'
-                        with open(file, 'w') as configfile:
-                            y.dump(tui_config, configfile)
-                        clear();
-                        thesettings();
-                    else:
-                        clear();
-                        print("Ok! returning...")
-                        thesettings();
             else:
-                clear();
-                print("Ok! returning...")
-                thesettings();
+                print(f"The SPECIAL RANGE MODULE is FALSE")
+                special_toggle = Bullet(
+                    prompt=f"{bold}        Would you like to enable the SPECIAL RANGE MODULE? {reset} \n",
+                    choices=[
+                        f'- {green}YES {colors.foreground["default"]}',
+                        f'- {red}NO  {colors.foreground["default"]}',
+                    ],
+                    bullet="",
+                    margin = 0,
+                    align = 22,
+                    word_on_switch=colors.foreground["white"],
+                    background_on_switch=colors.background["cyan"]
+                )
+                special_toggle_result = special_toggle.launch()
+                if special_toggle_result == f"- {green}YES {colors.foreground['default']}":
+                    print("The SPECIAL RANGE MODULE is now True")
+                    tui_config['toggles']['special'] = True
+                    with open(file, 'w') as configfile:
+                        y.dump(tui_config, configfile)
+                    print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
+                    tui_config['modifiers']['range'] = f'{special_range_input_result}'
+                    with open(file, 'w') as configfile:
+                        y.dump(tui_config, configfile)
+                    clear();
+                    thesettings()
+                else:
+                    clear();
+                    print("Ok! returning...")
+                    thesettings()
+        else:
+            clear();
+            print("Ok! returning...")
+            thesettings();
 
         def therange():
             randomnumber = random.randint(0, 1000)
@@ -452,30 +455,40 @@ def main():
                 qualitystatus = 'True'
                 qualitystatuscolor = green
 
-            print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+            qualitychoice = f'- Quality = {qualitystatuscolor}{qualitystatus:5}'
+            rangechoice = f'- Range = {rangestatuscolor}{rangestatus:5}'
+            specialchoice = f'- Special = {specialstatuscolor}{specialstatus:5}'
 
-            print("               +-----------------------+")
-            print(f"               | QUALITY       ={qualitystatuscolor} {qualitystatus:5} {reset}|")
-            print(f"               | RANGE         ={rangestatuscolor} {rangestatus:5} {reset}|")
-            print(f"               | SPECIAL RANGE ={specialstatuscolor} {specialstatus:5} {reset}|")
-            print("               +-----------------------+")
+            print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
             modules = Bullet(
                 prompt = f"{bold}                     Toggle modules: {reset} \n",
                 choices = [
-                    '- Quality ',
-                    '- Range   ',
-                    '- Special ',
-                    '- Exit    '
+                    f'{qualitychoice}',
+                    f'{rangechoice}',
+                    f'{specialchoice}',
+                    f'- Exit    '
                 ],
                 bullet = "",
                 margin = 0,
-                align = 22,
+                align = 20,
                 word_on_switch=colors.foreground["white"],
                 background_on_switch=colors.background["cyan"]
             )
             result = modules.launch()
+
+            if result == qualitychoice:
+                result = 0
+            elif result == rangechoice:
+                result = 1
+            elif result == specialchoice:
+                result = 2
+
             match result:
-                case '- Quality ':
+                case '- Exit    ':
+                    clear();
+                    thesettings();
+
+                case 0:
                     if tui_config['toggles']['quality'] == True:
                         print("The QUALITY MODULE is now False")
                         tui_config['toggles']['quality'] = False
@@ -488,7 +501,7 @@ def main():
                         with open(file, 'w') as configfile:
                             y.dump(tui_config, configfile)
                         toggle();
-                case '- Range   ':
+                case 1:
                     if tui_config['toggles']['range'] == True:
                         print("The RANGE MODULE is now False")
                         tui_config['toggles']['range'] = False
@@ -501,7 +514,7 @@ def main():
                         with open(file, 'w') as configfile:
                             y.dump(tui_config, configfile)
                         toggle();
-                case '- Special ':
+                case 2:
                     if tui_config['toggles']['special'] == True:
                         print("The SPECIAL RANGE MODULE is now False")
                         tui_config['toggles']['special'] = False
@@ -514,53 +527,51 @@ def main():
                         with open(file, 'w') as configfile:
                             y.dump(tui_config, configfile)
                         toggle();
-                case '- Exit    ':
-                    clear();
-                    thesettings();
 
-        clear();
-        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
-        settings = Bullet(
-            prompt = f"{bold}                       Settings:  {reset} \n",
-            choices = [
-                '- Toggle  ',
-                '- Provider',
-                '- Player  ',
-                '- Quality ',
-                '- Range   ',
-                '- Special ',
-                '- Exit    '
-            ],
-            bullet = "",
-            margin = 0,
-            align = 22,
-            word_on_switch=colors.foreground["white"],
-            background_on_switch=colors.background["cyan"]
-        )
-        result = settings.launch()
-        match result:
-            case '- Toggle  ':
-                clear();
-                toggle();
-            case '- Provider':
-                clear();
-                provider();
-            case '- Player  ':
-                clear();
-                player();
-            case '- Quality ':
-                clear();
-                quality();
-            case '- Range   ':
-                clear();
-                therange();
-            case '- Special ':
-                clear();
-                special();
-            case '- Exit    ':
-                clear();
-                menu();
-
+    clear();
+    print(f"{bold}{cyan}{ANIMDL_LOGO1}\n{ANIMDL_LOGO2}\n{ANIMDL_LOGO3}\n{ANIMDL_LOGO4}\n{ANIMDL_LOGO5}\n{reset}");
+    settings = Bullet(
+        prompt = f"{bold}                       Settings:  {reset} \n",
+        choices = [
+            '- Toggle  ',
+            '- Provider',
+            '- Player  ',
+            '- Quality ',
+            '- Range   ',
+            '- Special ',
+            '- Exit    '
+        ],
+        bullet = "",
+        margin = 0,
+        align = 22,
+        word_on_switch=colors.foreground["white"],
+        background_on_switch=colors.background["cyan"]
+    )
+    result = settings.launch()
+    match result:
+        case '- Toggle  ':
+            clear()
+            toggle()
+        case '- Provider':
+            clear()
+            provider()
+        case '- Player  ':
+            clear()
+            player()
+        case '- Quality ':
+            clear()
+            quality()
+        case '- Range   ':
+            clear()
+            therange()
+        case '- Special ':
+            clear()
+            special()
+        case '- Exit    ':
+            clear()
+            menu()
+    
+def main():
     def update():
         match sys.platform:
             case 'win32':
@@ -576,51 +587,40 @@ def main():
                 else:
                     # Re-run the program with admin rights
                     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-                    os.system("powershell.exe %s" % (__file__))
+                    os.system(f"powershell.exe {__file__}")
 
             case _:
                 print("I can't test this with anything but windows rn.",
                 "Run \'sudo animdl update to update or whatever.\'")
-                exit();
+                sys.exit();
 
-    def web():
+    def web(app):
         app = Flask(__name__)
         @app.route("/")
         def index():
             return render_template('index.html')
+        print("big sex")
 
-        app.run();
+        app.run()
 
     def stream():
-        getkey();
+        getkey()
 
     def search():
-        getkey();
+        getkey()
 
     def schedule():
-        getkey();
+        getkey()
 
     def grab():
-        getkey();
+        getkey()
 
     def download():
-        getkey();
+        getkey()
 
     def menu():
-        def is_admin():
-            if sys.platform == 'win32':
-                try:
-                    return ctypes.windll.shell32.IsUserAnAdmin()
-                except:
-                    return False
-
-        cursor.hide();
-        if is_admin():
-            os.system("animdl update");
-            sleep(2)
-            clear();
-
-        print(f"{bold}{cyan}{animdl1}\n{animdl2}\n{animdl3}\n{animdl4}\n{animdl5}\n{reset}");
+        cursor.hide()
+        print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
         menu = Bullet(
             prompt = f"{bold}                       Main Menu:  {reset} \n",
             choices = [
@@ -675,5 +675,16 @@ def main():
 
 if __name__ == '__main__':
     clear();
+
+    def is_admin():
+        if sys.platform == 'win32':
+            return ctypes.windll.shell32.IsUserAnAdmin()
+
+
+    if is_admin():
+        os.system("animdl update");
+        sleep(2)
+        sys.exit();
+
     ctypes.windll.kernel32.SetConsoleTitleW("animdl-tui")
     main();

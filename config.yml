@@ -1,11 +1,11 @@
 modifiers:
-  provider: animepahe
+  provider: animixplay
   quality: 1080/best
-  range: null
+  range: latest-20
   special: null
 toggles:
-  quality: true
-  range: true
-  special: true
+  quality: 1080/best
+  range: false
+  special: false
 web:
   web: false
