@@ -36,6 +36,12 @@ def continue1():
     print("\n Press any key to continue")
     getkey()
 
+def cpts():
+    """"Fixes redundance and lint"""
+    clear()
+    print("Ok! returning...")
+    thesettings()
+
 def thesettings():
     """settings"""
     def special():
@@ -100,13 +106,9 @@ def thesettings():
                     clear()
                     thesettings()
                 else:
-                    clear()
-                    print("Ok! returning...")
-                    thesettings()
+                    cpts()
         else:
-            clear()
-            print("Ok! returning...")
-            thesettings()
+            cpts()
 
     def therange():
         randomnumber = random.randint(0, 1000)
@@ -170,9 +172,7 @@ def thesettings():
                     clear()
                     thesettings()
                 else:
-                    clear()
-                print("Ok! returning...")
-                thesettings()
+                    cpts()
     def quality():
         print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
         quality = Bullet(
@@ -232,9 +232,7 @@ def thesettings():
                             clear()
                             thesettings()
                 else:
-                    clear()
-                    print("Ok! returning...")
-                    thesettings()
+                    cpts()
     def player():
         print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
         player = Bullet(
