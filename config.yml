@@ -1,10 +1,12 @@
 modifiers:
+  dir: None
   provider: animixplay
   quality: 1080/best
   range: 1-89
   special: latest-89
 toggles:
-  quality: false
+  dir: true
+  quality: true
   range: false
   special: false
 web:
