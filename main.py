@@ -15,9 +15,6 @@ from flask import Flask, render_template
 
 ANIMDL_CONFIG = "animdl_config.yml"
 CONFIG_FILE = "config.yml"
-with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
-    tui_config = y.safe_load(configfile_read)
-
 
 cyan = fg("cyan")
 reset = attr("reset")
@@ -38,11 +35,13 @@ def continue1():
 
 def thesettings():
     """settings"""
+    with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+        tui_config = y.safe_load(configfile_read)
     def special():
         randomnumber = random.randint(0, 1000)
         print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
         special_range = Bullet(
-            prompt=f"{bold}         Are you sure you want a special range? {reset} \n",
+            prompt=f"{bold}        Are you sure you want a special range? {reset} \n",
             choices=[
                 f'- {green}YES {colors.foreground["default"]}',
                 f'- {red}NO  {colors.foreground["default"]}',
@@ -71,12 +70,12 @@ def thesettings():
                     y.dump(tui_config, configfile_write)
                     sleep(1)
                     clear()
-                    return
+                    thesettings()
 
             else:
-                print("The SPECIAL RANGE MODULE is FALSE")
+                print("     The SPECIAL RANGE MODULE is FALSE")
                 special_toggle = Bullet(
-                    prompt=f"{bold}        Would you like to enable the SPECIAL RANGE MODULE? {reset} \n",
+                    prompt=f"{bold}     Would you like to enable the SPECIAL RANGE MODULE? {reset} \n",
                     choices=[
                         f'- {green}YES {colors.foreground["default"]}',
                         f'- {red}NO  {colors.foreground["default"]}',
@@ -91,10 +90,10 @@ def thesettings():
                 if special_toggle_result == f"- {green}YES {colors.foreground['default']}":
                     print("The SPECIAL RANGE MODULE is now True")
                     tui_config['toggles']['special'] = True
-                    with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile:
-                        y.dump(tui_config, configfile)
+                    with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
+                        y.dump(tui_config, configfile_write)
                     print(f"The SPECIAL RANGE MODULE is now {special_range_input_result}")
-                    tui_config['modifiers']['range'] = f'{special_range_input_result}'
+                    tui_config['modifiers']['special'] = f'{special_range_input_result}'
                     with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
                         y.dump(tui_config, configfile_write)
                     clear()
@@ -107,12 +106,11 @@ def thesettings():
             clear()
             print("Ok! returning...")
             thesettings()
-
     def therange():
         randomnumber = random.randint(0, 1000)
         print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
         specific_range = Bullet(
-            prompt=f"{bold}         Are you sure you want a specific range? {reset} \n",
+            prompt=f"{bold}        Are you sure you want a specific range? {reset} \n",
             choices=[
                 f'- {green}YES {colors.foreground["default"]}',
                 f'- {red}NO  {colors.foreground["default"]}',
@@ -163,7 +161,7 @@ def thesettings():
                     with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
                         y.dump(tui_config, configfile_write)
                     print(f"The RANGE MODULE is now {specific_range_input_result}")
-                    tui_config['toggles']['range'] = f'{specific_range_input_result}'
+                    tui_config['modifiers']['range'] = f'{specific_range_input_result}'
                     with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
                         y.dump(tui_config, configfile_write)
                     sleep(1)
@@ -173,6 +171,10 @@ def thesettings():
                     clear()
                 print("Ok! returning...")
                 thesettings()
+        else:
+            clear()
+            print("Ok! returning...")
+            thesettings()
     def quality():
         print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
         quality = Bullet(
@@ -198,7 +200,7 @@ def thesettings():
             quality_input_result = quality_input.launch()
             if tui_config['toggles']['quality'] is True:
                 print(f"The QUALITY MODULE is now {quality_input_result}")
-                tui_config['toggles']['quality'] = f'{quality_input_result}'
+                tui_config['modifiers']['quality'] = f'{quality_input_result}'
                 with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
                     y.dump(tui_config, configfile_write)
                 sleep(1)
@@ -225,7 +227,7 @@ def thesettings():
                     with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
                         y.dump(tui_config, configfile_write)
                         print(f"The QUALITY MODULE is now {quality_input_result}")
-                        tui_config['toggles']['quality'] = f'{quality_input_result}'
+                        tui_config['modifiers']['quality'] = f'{quality_input_result}'
                         with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
                             y.dump(tui_config, configfile_write)
                             sleep(1)
@@ -235,6 +237,10 @@ def thesettings():
                     clear()
                     print("Ok! returning...")
                     thesettings()
+        else:
+            clear()
+            print("Ok! returning...")
+            thesettings()
     def player():
         print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
         player = Bullet(
@@ -281,8 +287,8 @@ def thesettings():
                     }
                     print("mpv should now be the selected player.")
 
-                    with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdlconfig:
-                        y.dump(data, animdlconfig)
+                    with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
+                        y.dump(data, animdl_config_write)
                     sleep(1)
                     thesettings()
 
@@ -299,11 +305,10 @@ def thesettings():
 
                     print("vlc should now be the selected player.")
 
-                    with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdlconfig:
-                        y.dump(data, animdlconfig)
+                    with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
+                        y.dump(data, animdl_config_write)
                     sleep(1)
                     thesettings()
-
 
                 case '- ffplay (ffmpeg)':
                     data = {
@@ -318,30 +323,28 @@ def thesettings():
 
                     print("ffplay should now be the selected player.")
 
-                    with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdlconfig:
-                        y.dump(data, animdlconfig)
+                    with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
+                        y.dump(data, animdl_config_write)
                     sleep(1)
                     thesettings()
 
                 case '- exit           ':
                     clear()
                     thesettings()
-
         else:
             clear()
             thesettings()
-
     def provider():
         print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
         provider = Bullet(
-            prompt=f"{bold}         Are you sure you want to switch to a different provider? (default: animixplay) {reset} \n",
+            prompt=f"{bold} Are you sure you want to switch to a different provider? \n                 (default: animixplay) {reset} \n",
             choices=[
                 f'- {green}YES {colors.foreground["default"]}',
                 f'- {red}NO  {colors.foreground["default"]}',
             ],
             bullet="",
             margin = 0,
-            align = 22,
+            align = 26,
             word_on_switch=colors.foreground["white"],
             background_on_switch=colors.background["cyan"]
         )
@@ -358,11 +361,11 @@ def thesettings():
                     '- gogoanime           ',
                     '- tenshi.moe          ',
                     '- allanime            ',
-                        '- exit                '
+                    '- exit                '
                     ],
                 bullet="",
                 margin = 0,
-                align = 22,
+                align = 26,
                 word_on_switch=colors.foreground["white"],
                 background_on_switch=colors.background["cyan"]
             )
@@ -427,6 +430,10 @@ def thesettings():
                 case '- exit                ':
                     clear()
                     thesettings()
+        else:
+            clear()
+            print("Ok! returning...")
+            thesettings()
 
     def toggle():
         clear()
@@ -605,11 +612,60 @@ def main():
         getkey()
 
     def grab():
-        getkey()
+        with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+            tui_config = y.safe_load(configfile_read)
+        provider = tui_config['modifiers']['provider']
+        grab = Input(
+            prompt = "Enter anime name: ",
+            indent = 0
+        )
+        grab.result = grab.launch()
+        os.system(f'animdl grab "{provider}:{grab.result}"')
 
     def download():
-        getkey()
+        with open (ANIMDL_CONFIG, 'r', encoding='utf8') as animdl_config_read:
+            animdl_config = y.safe_load(animdl_config_read)
 
+        with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+            tui_config = y.safe_load(configfile_read)
+
+        quality_status = tui_config['toggles']['quality']
+        quality = tui_config['modifiers']['quality']
+        range_status = tui_config['toggles']['range']
+        range = tui_config['modifiers']['range']
+        special_status = tui_config['toggles']['special']
+        special = tui_config['modifiers']['special']
+        provider = tui_config['modifiers']['provider']
+
+        cursor.show()
+        print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
+
+        print(f"Provider = {cyan}{tui_config['modifiers']['provider']}{reset}")
+        if quality_status is True:
+            qualityarg = f"-q {quality}"
+            print(f"Quality = {cyan}{quality}{reset}")
+        else:
+            qualityarg = ""
+            print(f"Quality is {red}{quality_status}{reset}")
+        if range_status is True:
+            rangearg = f"-r {range}"
+            print(f"Range = {cyan}{range}{reset}")
+        else:
+            rangearg = ""
+            print(f"Range is {red}{range_status}{reset}")
+        if special_status is True:
+            specialarg = f"-s {special}"
+            print(f"Special Range = {cyan}{special}{reset}")
+        else:
+            specialarg = ""
+            print(f"Special Range is {red}{special_status}{reset}")
+        print(f"Player = {cyan}{animdl_config['default_player']}{reset}")
+        download = Input(
+            prompt = "Enter anime name: ",
+            indent = 0
+        )
+        download.result = download.launch()
+        os.system(f'animdl download {specialarg} {rangearg} {qualityarg} "{provider}:{download.result}"')
     def menu():
         cursor.hide()
         print(f"{bold}{cyan}{ANIMDL1}\n{ANIMDL2}\n{ANIMDL3}\n{ANIMDL4}\n{ANIMDL5}\n{reset}")
@@ -633,9 +689,9 @@ def main():
             background_on_switch=colors.background["cyan"]
         )
 
-        result = menu.launch()
+        menu.result = menu.launch()
 
-        match result:
+        match menu.result:
             case '- Download':
                 clear()
                 download()
@@ -667,12 +723,33 @@ def main():
 
 if __name__ == '__main__':
     clear()
-
     def is_admin():
-        "if the user is administrator"
+        """if the user is administrator"""
         if sys.platform == 'win32':
             return ctypes.windll.shell32.IsUserAnAdmin()
 
+    python_path = os.path.dirname(sys.executable)
+    if os.path.exists(python_path) is True:
+        animdl_path = os.path.join(python_path,"Scripts\\animdl.exe")
+        if os.path.isfile(animdl_path) is True:
+            pass
+
+        else:
+            if is_admin():
+                os.system("pip install animdl")
+            print("Whoops, doesn't look like you have animdl installed.")
+            print("Please install it manually or by pressing enter. Thanks")
+            continue1()
+
+            if is_admin():
+                os.system("pip install animdl")
+                sys.exit()
+
+            else:
+                # Re-run the program with admin rights
+                ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    else:
+        print("How the fuck are you running this")
 
     if is_admin():
         os.system("animdl update")
