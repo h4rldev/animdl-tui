@@ -5,7 +5,14 @@
 A Terminal User Interface for [animdl](https://github.com/justfoolingaround/animdl)
 
 (_heck, I had to fork a library and make it better for this_)
+
 (__I WON'T ADD FUZZYFINDER FOR THIS BECAUSE TWIST.MOE IS RANCID__)
+
+## Todo
+
+- Web frontent for it
+- Code Cleanup
+- Less skill issues.
 
 ## Installation
 
