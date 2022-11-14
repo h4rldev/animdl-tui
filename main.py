@@ -725,15 +725,127 @@ def main():
             """empty"""
             return 0
 
+        @app.route("/download")
+        def download():
+            """empty"""
+            return 0
+
+        @app.route("/stream")
+        def stream():
+            """empty"""
+            return 0
+
         app.run()
 
     def stream():
         cursor.hide()
-        getkey()
+        with open (ANIMDL_CONFIG, 'r', encoding='utf8') as animdl_config_read:
+            animdl_config = y.safe_load(animdl_config_read)
+
+        with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+            tui_config = y.safe_load(configfile_read)
+
+        quality_status = tui_config['toggles']['quality']
+        quality = tui_config['modifiers']['quality']
+        animdlrange_status = tui_config['toggles']['range']
+        animdlrange = tui_config['modifiers']['range']
+        special_status = tui_config['toggles']['special']
+        special = tui_config['modifiers']['special']
+        provider = tui_config['modifiers']['provider']
+
+        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+
+        print(f"Provider = {cyan}{tui_config['modifiers']['provider']}{reset}")
+        if quality_status is True:
+            qualityarg = f"-q {quality}"
+            print(f" Quality = {cyan}{quality}{reset}")
+        else:
+            qualityarg = ""
+            print(f" Quality is {red}{quality_status}{reset}")
+        if animdlrange_status is True:
+            rangearg = f"-r {animdlrange}"
+            print(f" Range = {cyan}{animdlrange}{reset}")
+        else:
+            rangearg = ""
+            print(f" Range is {red}{animdlrange_status}{reset}")
+        if special_status is True:
+            specialarg = f"-s {special}"
+            print(f" Special Range = {cyan}{special}{reset}")
+        else:
+            specialarg = ""
+            print(f" Special Range is {red}{special_status}{reset}")
+        print(f" Player = {cyan}{animdl_config['default_player']}{reset}")
+        streamus = Input(
+            prompt = f"{cyan} Enter anime name.\n {red}:{reset} ",
+            indent = 0
+        )
+        streamus.result = streamus.launch()
+        os.system(f'animdl stream'
+                f'{specialarg} {rangearg} {qualityarg} "{provider}:{streamus.result}"')
+        clear()
+        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        locs = Bullet(
+            prompt = f"{cyan} Do you want to leave or do you want to continue streaming?{reset}",
+            choices = [
+                f"- {green}Continue",
+                f"- {red}Leave",
+            ],
+            bullet = "",
+            margin = 0,
+            align = 1,
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["white"]
+        )
+        locs.result = locs.launch()
+        if locs.result == f"- {green}Continue":
+            locs.result = 0
+        else:
+            locs.result = 1
+
+        match locs.result:
+            case 0:
+                clear()
+                stream()
+            case 1:
+                c_m()
 
     def search():
         cursor.hide()
-        getkey()
+        with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+            tui_config = y.safe_load(configfile_read)
+        provider = tui_config['modifiers']['provider']
+        search = Input(
+            prompt = f"{cyan} Enter anime name.\n {red}:{reset} ",
+            indent = 0
+        )
+        search.result = search.launch()
+        os.system(f'animdl search -p {provider} "{search.result}"')
+        clear()
+        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        locs = Bullet(
+            prompt = f"{cyan} Do you want to leave or do you want to continue searching?{reset}",
+            choices = [
+                f"- {green}Continue",
+                f"- {red}Leave",
+            ],
+            bullet = "",
+            margin = 0,
+            align = 1,
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["white"]
+        )
+        locs.result = locs.launch()
+        if locs.result == f"- {green}Continue":
+            locs.result = 0
+        else:
+            locs.result = 1
+
+        match locs.result:
+            case 0:
+                clear()
+                download()
+            case 1:
+                c_m()
 
     def schedule():
         cursor.hide()
@@ -765,8 +877,8 @@ def main():
             bullet = "",
             margin = 0,
             align = 1,
-            word_on_switch=colors.foreground["white"],
-            background_on_switch=colors.background["cyan"]
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["white"]
         )
         locg.result = locg.launch()
         if locg.result == f"- {green}Continue":
@@ -846,8 +958,8 @@ def main():
             bullet = "",
             margin = 0,
             align = 1,
-            word_on_switch=colors.foreground["white"],
-            background_on_switch=colors.background["cyan"]
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["white"]
         )
         locd.result = locd.launch()
         if locd.result == f"- {green}Continue":
