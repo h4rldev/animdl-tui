@@ -1,4 +1,4 @@
-# animdl-tui (DOES NOTHING AT THE MOMENT)
+# animdl-tui
 
 [![License](https://img.shields.io/github/license/h4rldev/animdl-tui?style=flat-square)](https://github.com/H4rldev/animdl-tui/blob/main/LICENSE)
 
@@ -7,6 +7,12 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 (_heck, I had to fork a library and make it better for this_)
 
 (__I WON'T ADD FUZZYFINDER FOR THIS BECAUSE TWIST.MOE IS RANCID__)
+
+### FIRST RELEASE
+
+First working release!! (expect bugs)
+
+Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
 ## Todo
 
