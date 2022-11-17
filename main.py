@@ -13,8 +13,68 @@ from click import clear
 from colored import attr, fg
 from flask import Flask, render_template
 
+def checkforadmin():
+    """Checks if the user is admin"""
+    if sys.platform == 'win32':
+        return ctypes.windll.shell32.IsUserAnAdmin()
+
+PYTHON_PATH = os.path.dirname(sys.executable)
+
+ANIMDL = "[animdl-tui]"
 ANIMDL_CONFIG = "animdl_config.yml"
 CONFIG_FILE = "config.yml"
+
+ANIMDL_DEFAULT = {
+    "default_player": "mpv",
+    "players": {
+        "mpv": {
+            "executable": "mpv",
+            "opts": []
+        }
+    },
+    "discord_presence": False
+}
+CONFIG_DEFAULT = {
+    "modifiers":{
+        "dir": "",
+        "provider": "animixplay",
+        "quality": "1080/best",
+        "range": "1-89",
+        "special": "latest-89"
+    },
+    "toggles":{
+        "dir": True,
+        "quality": True,
+        "range": False,
+        "special": False,
+    },
+    "web":{
+        "web": False
+    }
+}
+
+if os.path.exists(PYTHON_PATH) is True:
+    ANIMDL_PATH = os.path.join(PYTHON_PATH,"Scripts\\animdl.exe")
+    PYPRESENCE_PATH = os.path.join(PYTHON_PATH,"Lib\\site-packages\\pypresence")
+else:
+    print("How the fuck are you running this script")
+
+def ispypresenceon():
+    """Checks if pypresence is enabled or not"""
+    with open(ANIMDL_CONFIG, "r", encoding="utf-8") as animdl_config_read:
+        pypresence_check = y.safe_load(animdl_config_read)
+        if pypresence_check["discord_presence"] is True:
+            return True
+        return False
+
+
+def checkifexists(file, mode, default_data):
+    """Checks if a file exists, if it doesn't it, it creates it and writes default data to it"""
+    if os.path.isfile(file) is False:
+        with open(file, mode, encoding="utf-8") as make_config_file:
+            y.dump(default_data, make_config_file)
+    else:
+        pass
 
 cyan = fg("cyan")
 reset = attr("reset")
@@ -27,9 +87,10 @@ purple = fg("54")
 yellow = fg("yellow")
 randcolors = [cyan, green, red, blue, orange, purple, yellow]
 
-randomcolors = random.choice(randcolors)
-
-ANIMDL = "[animdl-tui]"
+def randcolforname(name):
+    """Randomly changes the color of a string based on an array of values"""
+    randomcolors = random.choice(randcolors)
+    print(f"{bold}{randomcolors} {name}\n{reset}")
 
 def continue1():
     """Continue function"""
@@ -57,11 +118,12 @@ def thesettings():
     cursor.hide()
     with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
         tui_config = y.safe_load(configfile_read)
+    with open(ANIMDL_CONFIG, 'r', encoding="utf-8") as animdl_config_read:
+        animdl_config = y.safe_load(animdl_config_read)
     def special():
         cursor.hide()
         randomnumber = random.randint(0, 1000)
-        print(
-            f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         special_range = Bullet(
             prompt = f"{cyan} Are you sure you want a special range? {reset} \n",
             choices = [
@@ -77,8 +139,7 @@ def thesettings():
         result = special_range.launch()
         if result == f"- {green}Yes {colors.foreground['default']}":
             clear()
-            print(
-                f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+            randcolforname(ANIMDL)
             special_range_input = Input(
                 prompt = (f"{cyan} Specify a special range.{reset}"
                         f" (Example: \"latest-{randomnumber}\")\n {red}:{reset} "),
@@ -130,8 +191,7 @@ def thesettings():
     def therange():
         cursor.hide()
         randomnumber = random.randint(0, 1000)
-        print(
-            f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         specific_range = Bullet(
             prompt = f"{cyan} Are you sure you want a specific range? {reset} \n",
             choices = [
@@ -147,8 +207,7 @@ def thesettings():
         result = specific_range.launch()
         if result == f"- {green}Yes {colors.foreground['default']}":
             clear()
-            print(
-                f"{bold}{randomcolors}{ANIMDL}\n{reset}")
+            randcolforname(ANIMDL)
             specific_range_input = Input(
                 prompt = (f"{cyan}Specify a range.{reset}"
                         f" (Example: \"{randomnumber}-{randomnumber}\")"
@@ -198,8 +257,7 @@ def thesettings():
 
     def quality():
         cursor.hide()
-        print(
-            f"{bold}{randomcolors}{ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         quality = Bullet(
             prompt = f"{cyan} Are you sure you want a specific quality? {reset} \n",
             choices = [
@@ -215,8 +273,7 @@ def thesettings():
         result = quality.launch()
         if result == f"- {green}Yes {colors.foreground['default']}":
             clear()
-            print(
-                f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+            randcolforname(ANIMDL)
             quality_input = Input(
                 prompt = (f"{cyan} Specify a quality.{reset}"
                 f" (Examples: '1080', '1080/best', '1080/worst',"
@@ -265,8 +322,7 @@ def thesettings():
 
     def player():
         cursor.hide()
-        print(
-            f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         player = Bullet(
             prompt = (f"{cyan}"
             f" Are you sure you want to switch to a different player?{reset} \n (default: mpv) \n"),
@@ -283,8 +339,7 @@ def thesettings():
         result = player.launch()
         if result == f"- {green}Yes {colors.foreground['default']}":
             clear()
-            print(
-                f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+            randcolforname(ANIMDL)
             player_choice = Bullet(
                 prompt = f"{cyan} Choose a player. {reset} \n",
                 choices = [
@@ -362,8 +417,7 @@ def thesettings():
 
     def provider():
         cursor.hide()
-        print(
-            f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         provider = Bullet(
             prompt = (f"{cyan} Are you sure you want to switch to a different provider? {reset}\n"
                     f" (default: animixplay) \n"),
@@ -380,8 +434,7 @@ def thesettings():
         result = provider.launch()
         if result == f"- {green}Yes {colors.foreground['default']}":
             clear()
-            print(
-                f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+            randcolforname(ANIMDL)
             provider_choice = Bullet(
                 prompt = f"{cyan} Choose a provider {reset} (sorted by latency). \n",
                 choices = [
@@ -459,6 +512,12 @@ def thesettings():
     def toggle():
         cursor.hide()
         clear()
+        if animdl_config['discord_presence'] is False:
+            presencestatus = 'False'
+            presencestatuscolor = red
+        else:
+            presencestatus = 'True'
+            presencestatuscolor = green
         if tui_config['toggles']['special'] is False:
             specialstatus = 'False'
             specialstatuscolor = red
@@ -491,9 +550,9 @@ def thesettings():
         dirchoice = f'- DIR = {dirstatuscolor}{dirstatus:5}'
         rangechoice = f'- RANGE = {rangestatuscolor}{rangestatus:5}'
         specialchoice = f'- SPECIAL RANGE = {specialstatuscolor}{specialstatus:5}'
+        presencechoice = f'- DISCORD PRESENCE = {presencestatuscolor}{presencestatus:5}'
 
-        print(
-            f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         modules = Bullet(
             prompt = f"{cyan} Toggle modules: {reset} \n",
             choices = [
@@ -501,6 +560,7 @@ def thesettings():
                 f'{dirchoice}',
                 f'{rangechoice}',
                 f'{specialchoice}',
+                f'{presencechoice}',
                 '- Exit    '
             ],
             bullet = "",
@@ -519,6 +579,8 @@ def thesettings():
             result = 2
         elif result == specialchoice:
             result = 3
+        elif result == presencechoice:
+            result = 4
 
         match result:
             case '- Exit    ':
@@ -576,11 +638,23 @@ def thesettings():
                     with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
                         y.dump(tui_config, configfile_write)
                     toggle()
+            case 4:
+                if animdl_config['discord_presence'] is True:
+                    print(" ´DISCORD PRESENCE´ is now False")
+                    animdl_config['discord_presence'] = False
+                    with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
+                        y.dump(animdl_config, animdl_config_write)
+                    toggle()
+                else:
+                    print(" ´DISCORD PRESENCE´ is now True")
+                    animdl_config['discord_presence'] = True
+                    with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
+                        y.dump(animdl_config, animdl_config_write)
+                    toggle()
 
     def directory():
         cursor.hide()
-        print(
-            f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         directory = Bullet(
             prompt = f"{cyan} Are you sure you want a specific directory? {reset} \n",
             choices = [
@@ -596,8 +670,7 @@ def thesettings():
         result = directory.launch()
         if result == f"- {green}Yes {colors.foreground['default']}":
             clear()
-            print(
-                f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+            randcolforname(ANIMDL)
             dir_input = Input(
                 prompt = (f"{cyan} Enter a vaild directory. (Example: 'C:\\Users\\'){reset}"
                 f"\n {red}:{reset} "),
@@ -644,7 +717,7 @@ def thesettings():
             cpts()
 
     clear()
-    print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+    randcolforname(ANIMDL)
     settings = Bullet(
         prompt = f"{green} Settings: {reset} \n",
         choices = [
@@ -695,22 +768,21 @@ def main():
     cursor.hide()
     def update():
         cursor.hide()
-        match sys.platform:
-            case 'win32':
-                if is_admin():
-                    os.system("animdl update")
-                    os.system("pause")
-
-                else:
-                    # Re-run the program with admin rights
-                    ctypes.windll.shell32.ShellExecuteW(
-                        None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-                    os.system(f"powershell.exe {__file__}")
-
-            case _:
-                print("I can't test this with anything but windows rn.",
-                    "Run \'sudo animdl update to update or whatever.\'")
-                sys.exit()
+        if os.path.isfile("update.txt") is True:
+            print("Seems like you encountered a bug. Please report it to me on github.com")
+        else:
+            with open("update.txt", "a", encoding="utf-8") as update_signal:
+                update_signal.write("updatus")
+                print("animdl will try to update on next startup of animdl-tui")
+            ctypes.windll.shell32.ShellExecuteW(
+                None,
+                "runas",
+                sys.executable,
+                " ".join(sys.argv),
+                None,
+                1
+            )
+            sys.exit()
 
     def web():
         cursor.hide()
@@ -753,7 +825,7 @@ def main():
         special = tui_config['modifiers']['special']
         provider = tui_config['modifiers']['provider']
 
-        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
 
         print(f"Provider = {cyan}{tui_config['modifiers']['provider']}{reset}")
         if quality_status is True:
@@ -782,8 +854,9 @@ def main():
         streamus.result = streamus.launch()
         os.system(f'animdl stream'
                 f'{specialarg} {rangearg} {qualityarg} "{provider}:{streamus.result}"')
+        continue1()
         clear()
-        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         locs = Bullet(
             prompt = f"{cyan} Do you want to leave or do you want to continue streaming?{reset}",
             choices = [
@@ -821,7 +894,7 @@ def main():
         search.result = search.launch()
         os.system(f'animdl search -p {provider} "{search.result}"')
         clear()
-        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         locs = Bullet(
             prompt = f"{cyan} Do you want to leave or do you want to continue searching?{reset}",
             choices = [
@@ -849,7 +922,7 @@ def main():
 
     def schedule():
         cursor.hide()
-        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         print(f"{cyan} Schedule: {reset}")
         os.system("animdl schedule")
         continue1()
@@ -867,7 +940,7 @@ def main():
         grab.result = grab.launch()
         os.system(f'animdl grab "{provider}:{grab.result}"')
         clear()
-        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         locg = Bullet(
             prompt = f"{cyan} Do you want to leave or do you want to continue grabbing?{reset}",
             choices = [
@@ -911,7 +984,7 @@ def main():
         special = tui_config['modifiers']['special']
         provider = tui_config['modifiers']['provider']
 
-        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
 
         print(f"Provider = {cyan}{tui_config['modifiers']['provider']}{reset}")
         if quality_status is True:
@@ -948,7 +1021,7 @@ def main():
                 f'{specialarg} {rangearg} {qualityarg} {directoryarg} '
                 f'"{provider}:{downloadus.result}"')
         clear()
-        print(f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         locd = Bullet(
             prompt = f"{cyan} Do you want to leave or do you want to continue downloading?{reset}",
             choices = [
@@ -976,8 +1049,7 @@ def main():
 
     def menu():
         cursor.hide()
-        print(
-            f"{bold}{randomcolors} {ANIMDL}\n{reset}")
+        randcolforname(ANIMDL)
         menu = Bullet(
             prompt = f"{green} Main Menu: {reset} \n",
             choices = [
@@ -988,7 +1060,7 @@ def main():
                 '- Grab    ',
                 '- Update  ',
                 '- Settings',
-                '- Web     ',
+                '- Web (WIP/Not Working)',
                 '- Exit    '
             ],
             bullet = "",
@@ -1022,7 +1094,7 @@ def main():
             case '- Settings':
                 clear()
                 thesettings()
-            case '- Web     ':
+            case '- Web (WIP/Not Working)':
                 clear()
                 web()
             case '- Exit    ':
@@ -1033,39 +1105,95 @@ def main():
 if __name__ == '__main__':
     clear()
     cursor.hide()
-    def is_admin():
-        """if the user is administrator"""
-        if sys.platform == 'win32':
-            return ctypes.windll.shell32.IsUserAnAdmin()
-
-    python_path = os.path.dirname(sys.executable)
-    if os.path.exists(python_path) is True:
-        animdl_path = os.path.join(python_path,"Scripts\\animdl.exe")
-        if os.path.isfile(animdl_path) is True:
-            pass
-
-        else:
-            if is_admin():
-                os.system("pip install animdl")
-            print("Whoops, doesn't look like you have animdl installed.")
-            print("Please install it manually or by pressing enter. Thanks")
-            continue1()
-
-            if is_admin():
-                os.system("pip install animdl")
-                sys.exit()
-
-            else:
-                # Re-run the program with admin rights
-                ctypes.windll.shell32.ShellExecuteW(None,
-                "runas", sys.executable, " ".join(sys.argv), None, 1)
+    if checkforadmin() is True:
+        ctypes.windll.kernel32.SetConsoleTitleW("animdl-tui - Administrator")
     else:
-        print("How the fuck are you running this")
+        ctypes.windll.kernel32.SetConsoleTitleW("animdl-tui")
 
-    if is_admin():
-        os.system("animdl update")
-        sleep(2)
-        sys.exit()
+    checkifexists(ANIMDL_CONFIG, 'x', ANIMDL_DEFAULT)
+    checkifexists(CONFIG_FILE, 'x', CONFIG_DEFAULT)
 
-    ctypes.windll.kernel32.SetConsoleTitleW("animdl-tui")
+    if checkforadmin() and os.path.isfile("animdl.txt") is True:
+        with open("update.txt", "r", encoding="utf-8") as animdl_signal_read:
+            if animdl_signal_read.read() == "animdl installus":
+                os.system("pip install animdl")
+            else:
+                print("bruh")
+        os.remove("animdl.txt")
+        continue1()
+        clear()
+    else:
+        pass
+
+    if checkforadmin() and os.path.isfile("pypresence.txt") is True:
+        with open("update.txt", "r", encoding="utf-8") as pypresence_signal_read:
+            if pypresence_signal_read.read() == "pypresence installus":
+                os.system("pip install pypresence")
+            else:
+                print("bruh")
+        os.remove("pypresence.txt")
+        continue1()
+        clear()
+    else:
+        pass
+
+    if checkforadmin() and os.path.isfile("update.txt") is True:
+        with open("update.txt", "r", encoding="utf-8") as update_signal_read:
+            if update_signal_read.read() == "updatus":
+                os.system("animdl update")
+            else:
+                print("bruh")
+        os.remove("update.txt")
+        continue1()
+        clear()
+    else:
+        pass
+
+
+    if os.path.isfile(ANIMDL_PATH) is True:
+        pass
+
+    else:
+        print("Whoops, doesn't look like you have animdl installed.")
+        print("Please install it manually or by pressing enter. Thanks")
+        continue1()
+        if os.path.isfile("animdl.txt") is True:
+            print("Seems like you encountered a bug. Please report it to me on github.com")
+        else:
+            with open("animdl.txt", "a", encoding="utf-8") as animdl_signal:
+                animdl_signal.write("animdl installus")
+                print("animdl will try to install on next startup of animdl-tui")
+            ctypes.windll.shell32.ShellExecuteW(
+                None,
+                "runas",
+                sys.executable,
+                " ".join(sys.argv),
+                None,
+                1
+            )
+            sys.exit()
+
+    if os.path.exists(PYPRESENCE_PATH) is True and ispypresenceon() is True:
+        pass
+
+    else:
+        print("Whoops, doesn't look like you have pypresence installed.")
+        print("Please install it manually or by pressing enter. Thanks")
+        continue1()
+        if os.path.isfile("pypresence.txt") is True:
+            print("Seems like you encountered a bug. Please report it to me on github.com")
+        else:
+            with open("pypresence.txt", "a", encoding="utf-8") as pypresence_signal:
+                pypresence_signal.write("pypresence installus")
+                print("pypresence will try to install on next startup of animdl-tui")
+            ctypes.windll.shell32.ShellExecuteW(
+                None,
+                "runas",
+                sys.executable,
+                " ".join(sys.argv),
+                None,
+                1
+            )
+            sys.exit()
+
     main()
