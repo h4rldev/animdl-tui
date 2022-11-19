@@ -59,14 +59,13 @@ if os.path.exists(PYTHON_PATH) is True:
 else:
     print("How the fuck are you running this script")
 
-def ispypresenceon():
+def ismoduleon(config_file, module: str):
     """Checks if pypresence is enabled or not"""
-    with open(ANIMDL_CONFIG, "r", encoding="utf-8") as animdl_config_read:
-        pypresence_check = y.safe_load(animdl_config_read)
-        if pypresence_check["discord_presence"] is True:
-            return True
+    with open(config_file, 'r', encoding="utf-8") as module_io:
+        module_check = y.safe_load(module_io)
+        if module_check[module] is True:
+            return module_check[module]
         return False
-
 
 def checkifexists(file, mode, default_data):
     """Checks if a file exists, if it doesn't it, it creates it and writes default data to it"""
@@ -650,7 +649,39 @@ def thesettings():
                     animdl_config['discord_presence'] = True
                     with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
                         y.dump(animdl_config, animdl_config_write)
-                    toggle()
+                    if os.path.exists(PYPRESENCE_PATH) is True and ismoduleon(
+                    ANIMDL_CONFIG,
+                    "discord_presence"
+                    ) is True:
+                        toggle()
+
+                    else:
+                        print("Whoops, doesn't look like you have pypresence installed.")
+                        print("Please install it manually or by pressing enter. Thanks")
+                        continue1()
+                        if os.path.isfile("pypresence.txt") is True:
+                            print(
+                                "Seems like you encountered a bug."
+                                "Please report it to me on github.com"
+                            )
+                        else:
+                            with open("pypresence.txt",
+                                "a",
+                                encoding="utf-8"
+                            ) as pypresence_signal2:
+                                pypresence_signal2.write("pypresence installus")
+                                print(
+                                    "pypresence will try to install on next startup of animdl-tui"
+                                )
+                            ctypes.windll.shell32.ShellExecuteW(
+                                None,
+                                "runas",
+                                sys.executable,
+                                " ".join(sys.argv),
+                                None,
+                                1
+                            )
+                            sys.exit()
 
     def directory():
         cursor.hide()
@@ -1173,7 +1204,10 @@ if __name__ == '__main__':
             )
             sys.exit()
 
-    if os.path.exists(PYPRESENCE_PATH) is True and ispypresenceon() is True:
+    if os.path.exists(PYPRESENCE_PATH) is True and ismoduleon(
+        ANIMDL_CONFIG,
+        "discord_presence"
+        ) is True:
         pass
 
     else:
