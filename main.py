@@ -3,7 +3,6 @@ import ctypes
 import os
 import random
 import sys
-import importlib.util
 from msvcrt import getch as getkey
 from time import sleep
 
@@ -55,8 +54,8 @@ CONFIG_DEFAULT = {
 
 def doespackageexist(package):
     """Checks if a package exists"""
-    is_present = importlib.util.find_spec(package) #find_spec will look for the package
-    if is_present is None:
+    is_present = os.system(f"pip show {package}")
+    if is_present == 1:
         return False
     return True
 
@@ -824,21 +823,6 @@ def main():
         def index():
             return render_template('index.html')
 
-        @app.route("/")
-        def backend():
-            """empty"""
-            return 0
-
-        @app.route("/download")
-        def download():
-            """empty"""
-            return 0
-
-        @app.route("/stream")
-        def stream():
-            """empty"""
-            return 0
-
         app.run()
 
     def stream():
@@ -884,6 +868,23 @@ def main():
             indent = 0
         )
         streamus.result = streamus.launch()
+        streamareyousure = Bullet(
+            prompt = f"{cyan} Are you sure you want to stream {streamus.result}? \n",
+            choices = [
+                f"- {green}Yes",
+                f"- {red}No",
+            ],
+            bullet = "",
+            margin = 0,
+            align = 1,
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["white"]
+        )
+        streamareyousure.result = streamareyousure.launch()
+        if streamareyousure.result == f"- {green}Yes":
+            pass
+        else:
+            c_m()
         os.system(f'animdl stream'
                 f'{specialarg} {rangearg} {qualityarg} "{provider}:{streamus.result}"')
         continue1()
@@ -919,13 +920,29 @@ def main():
         with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
             tui_config = y.safe_load(configfile_read)
         provider = tui_config['modifiers']['provider']
-        search = Input(
+        searchus = Input(
             prompt = f"{cyan} Enter anime name.\n {red}:{reset} ",
             indent = 0
         )
-        search.result = search.launch()
-        os.system(f'animdl search -p {provider} "{search.result}"')
-        continue1()
+        searchus.result = searchus.launch()
+        searchusareyousure = Bullet(
+            prompt = f"{cyan} Are you sure you want to search {searchus.result}? \n",
+            choices = [
+                f"- {green}Yes",
+                f"- {red}No",
+            ],
+            bullet = "",
+            margin = 0,
+            align = 1,
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["white"]
+        )
+        searchusareyousure.result = searchusareyousure.launch()
+        if searchusareyousure.result == f"- {green}Yes":
+            pass
+        else:
+            c_m()
+        os.system(f'animdl search -p {provider} "{searchus.result}"')
         clear()
         randcolforname(ANIMDL)
         locs = Bullet(
@@ -966,12 +983,29 @@ def main():
         with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
             tui_config = y.safe_load(configfile_read)
         provider = tui_config['modifiers']['provider']
-        grab = Input(
+        grabus = Input(
             prompt = f"{cyan} Enter anime name.\n {red}:{reset} ",
             indent = 0
         )
-        grab.result = grab.launch()
-        os.system(f'animdl grab "{provider}:{grab.result}"')
+        grabus.result = grabus.launch()
+        grabusareyousure = Bullet(
+            prompt = f"{cyan} Are you sure you want to search {grabus.result}? \n",
+            choices = [
+                f"- {green}Yes",
+                f"- {red}No",
+            ],
+            bullet = "",
+            margin = 0,
+            align = 1,
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["white"]
+        )
+        grabusareyousure.result = grabusareyousure.launch()
+        if grabusareyousure.result == f"- {green}Yes":
+            pass
+        else:
+            c_m()
+        os.system(f'animdl grab "{provider}:{grabus.result}"')
         continue1()
         clear()
         randcolforname(ANIMDL)
@@ -1051,6 +1085,23 @@ def main():
             indent = 0
         )
         downloadus.result = downloadus.launch()
+        downloadusareyousure = Bullet(
+            prompt = f"{cyan} Are you sure you want to search {downloadus.result}? \n",
+            choices = [
+                f"- {green}Yes",
+                f"- {red}No",
+            ],
+            bullet = "",
+            margin = 0,
+            align = 1,
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["white"]
+        )
+        downloadusareyousure.result = downloadusareyousure.launch()
+        if downloadusareyousure.result == f"- {green}Yes":
+            pass
+        else:
+            c_m()
         os.system(f'animdl download'
                 f'{specialarg} {rangearg} {qualityarg} {directoryarg} '
                 f'"{provider}:{downloadus.result}"')
@@ -1150,7 +1201,7 @@ if __name__ == '__main__':
     checkifexists(CONFIG_FILE, 'x', CONFIG_DEFAULT)
 
     if checkforadmin() and os.path.isfile("animdl.txt") is True:
-        with open("update.txt", "r", encoding="utf-8") as animdl_signal_read:
+        with open("animdl.txt", "r", encoding="utf-8") as animdl_signal_read:
             if animdl_signal_read.read() == "animdl installus":
                 os.system("pip install animdl")
             else:
@@ -1162,7 +1213,7 @@ if __name__ == '__main__':
         pass
 
     if checkforadmin() and os.path.isfile("pypresence.txt") is True:
-        with open("update.txt", "r", encoding="utf-8") as pypresence_signal_read:
+        with open("pypresence.txt", "r", encoding="utf-8") as pypresence_signal_read:
             if pypresence_signal_read.read() == "pypresence installus":
                 os.system("pip install pypresence")
             else:
@@ -1207,6 +1258,7 @@ if __name__ == '__main__':
                 None,
                 1
             )
+
             sys.exit()
 
     if doespackageexist("pypresence") is True and ismoduleon(
@@ -1239,5 +1291,5 @@ if __name__ == '__main__':
             sys.exit()
     else:
         pass
-
+    clear()
     main()
