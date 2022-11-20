@@ -989,7 +989,7 @@ def main():
         )
         grabus.result = grabus.launch()
         grabusareyousure = Bullet(
-            prompt = f"{cyan} Are you sure you want to search {grabus.result}? \n",
+            prompt = f"{cyan} Are you sure you want to grab {grabus.result}? \n",
             choices = [
                 f"- {green}Yes",
                 f"- {red}No",
@@ -1086,7 +1086,7 @@ def main():
         )
         downloadus.result = downloadus.launch()
         downloadusareyousure = Bullet(
-            prompt = f"{cyan} Are you sure you want to search {downloadus.result}? \n",
+            prompt = f"{cyan} Are you sure you want to download {downloadus.result}? \n",
             choices = [
                 f"- {green}Yes",
                 f"- {red}No",
