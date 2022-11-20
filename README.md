@@ -76,4 +76,5 @@ pyinstaller --onefile --hidden-import animdl --hidden-import pypresence  --icon 
 - Python 3.10 (probably)
 - Windows (as of right now)
 - [animdl](https://github.com/justfoolingaround/animdl)
-- probably some other deps (there's no working version yet so i'll figure this out later).
+- [mpv](https://mpv.io/)
+- other deps i can't find out atm
