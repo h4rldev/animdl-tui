@@ -42,11 +42,12 @@ From the command line
 
 Run in the cloned repository:
 
+Run it directly or:
 `python main.py`
 
 Build in the cloned repository:
 
-`pyinstaller --onefile main.py`
+`pyinstaller --onefile --hidden-import animdl --hidden-import pypresence  --icon logo.ico main.py`
 
 ## Requirements (building)
 
