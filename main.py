@@ -3,6 +3,7 @@ import ctypes
 import os
 import random
 import sys
+import importlib.util
 from msvcrt import getch as getkey
 from time import sleep
 
@@ -18,11 +19,10 @@ def checkforadmin():
     if sys.platform == 'win32':
         return ctypes.windll.shell32.IsUserAnAdmin()
 
-PYTHON_PATH = os.path.dirname(sys.executable)
-
 ANIMDL = "[animdl-tui]"
 ANIMDL_CONFIG = "animdl_config.yml"
 CONFIG_FILE = "config.yml"
+
 
 ANIMDL_DEFAULT = {
     "default_player": "mpv",
@@ -53,11 +53,12 @@ CONFIG_DEFAULT = {
     }
 }
 
-if os.path.exists(PYTHON_PATH) is True:
-    ANIMDL_PATH = os.path.join(PYTHON_PATH,"Scripts\\animdl.exe")
-    PYPRESENCE_PATH = os.path.join(PYTHON_PATH,"Lib\\site-packages\\pypresence")
-else:
-    print("How the fuck are you running this script")
+def doespackageexist(package):
+    """Checks if a package exists"""
+    is_present = importlib.util.find_spec(package) #find_spec will look for the package
+    if is_present is None:
+        return False
+    return True
 
 def ismoduleon(config_file, module: str):
     """Checks if pypresence is enabled or not"""
@@ -244,7 +245,7 @@ def thesettings():
                         y.dump(tui_config, configfile_write)
                     print(
                         f" ´RANGE´ is now {specific_range_input_result}")
-                    tui_config['toggles']['range'] = f'{specific_range_input_result}'
+                    tui_config['modifiers']['range'] = f'{specific_range_input_result}'
                     with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
                         y.dump(tui_config, configfile_write)
                     sleep(1)
@@ -649,7 +650,7 @@ def thesettings():
                     animdl_config['discord_presence'] = True
                     with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
                         y.dump(animdl_config, animdl_config_write)
-                    if os.path.exists(PYPRESENCE_PATH) is True and ismoduleon(
+                    if doespackageexist("pypresence") is True and ismoduleon(
                     ANIMDL_CONFIG,
                     "discord_presence"
                     ) is True:
@@ -924,6 +925,7 @@ def main():
         )
         search.result = search.launch()
         os.system(f'animdl search -p {provider} "{search.result}"')
+        continue1()
         clear()
         randcolforname(ANIMDL)
         locs = Bullet(
@@ -970,6 +972,7 @@ def main():
         )
         grab.result = grab.launch()
         os.system(f'animdl grab "{provider}:{grab.result}"')
+        continue1()
         clear()
         randcolforname(ANIMDL)
         locg = Bullet(
@@ -1051,6 +1054,7 @@ def main():
         os.system(f'animdl download'
                 f'{specialarg} {rangearg} {qualityarg} {directoryarg} '
                 f'"{provider}:{downloadus.result}"')
+        continue1()
         clear()
         randcolforname(ANIMDL)
         locd = Bullet(
@@ -1136,6 +1140,7 @@ def main():
 if __name__ == '__main__':
     clear()
     cursor.hide()
+
     if checkforadmin() is True:
         ctypes.windll.kernel32.SetConsoleTitleW("animdl-tui - Administrator")
     else:
@@ -1181,7 +1186,7 @@ if __name__ == '__main__':
         pass
 
 
-    if os.path.isfile(ANIMDL_PATH) is True:
+    if doespackageexist("animdl") is True:
         pass
 
     else:
@@ -1204,13 +1209,16 @@ if __name__ == '__main__':
             )
             sys.exit()
 
-    if os.path.exists(PYPRESENCE_PATH) is True and ismoduleon(
+    if doespackageexist("pypresence") is True and ismoduleon(
         ANIMDL_CONFIG,
         "discord_presence"
         ) is True:
         pass
 
-    else:
+    elif doespackageexist("pypresence") is False and ismoduleon(
+        ANIMDL_CONFIG,
+        "discord_presence"
+        ) is True:
         print("Whoops, doesn't look like you have pypresence installed.")
         print("Please install it manually or by pressing enter. Thanks")
         continue1()
@@ -1229,5 +1237,7 @@ if __name__ == '__main__':
                 1
             )
             sys.exit()
+    else:
+        pass
 
     main()

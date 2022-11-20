@@ -8,9 +8,17 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 
 (__I WON'T ADD FUZZYFINDER FOR THIS BECAUSE TWIST.MOE IS RANCID__)
 
-### FIRST RELEASE
+## News
 
 First working release!! (expect bugs)
+
+How to run:
+
+```shell
+git clone https://github.com/H4rldev/animdl-tui
+cd animdl-tui
+main.py
+```
 
 Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
