@@ -1054,7 +1054,7 @@ def main():
 
         randcolforname(ANIMDL)
 
-        print(f"Provider = {cyan}{tui_config['modifiers']['provider']}{reset}")
+        print(f" Provider = {cyan}{tui_config['modifiers']['provider']}{reset}")
         if quality_status is True:
             qualityarg = f"-q {quality}"
             print(f" Quality = {cyan}{quality}{reset}")
