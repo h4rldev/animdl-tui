@@ -22,7 +22,7 @@ main.py
 
 > or:
 
-Download from the [releases](https://github.com/h4rldev/animdl-tui/releases)
+Download from the [releases](https://github.com/h4rldev/animdl-tui/releases/latest)
 
 Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
@@ -34,7 +34,7 @@ Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
 ## Installation
 
-1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases)
+1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases/latest)
 2. Put the executable anywhere.
 3. Execute the name of the executable in your terminal or make a shortcut.
 4. Profit???
