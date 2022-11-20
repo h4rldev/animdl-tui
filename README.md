@@ -30,24 +30,36 @@ Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
 ## Installation
 
-1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases) (currently empty due to it not even having a working release atm due to me not even implementing it yet)
-2. Put the executable in a directory.
-3. Put the directory in path.
-4. Execute the name of the executable in your terminal.
-5. Profit???
+1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases)
+2. Put the executable anywhere.
+3. Execute the name of the executable in your terminal or make a shortcut.
+4. Profit???
 
 ## Build/running latest
 
-From the command line
+### From the command line
 
-Run in the cloned repository:
+> Run in the cloned repository:
 
-Run it directly or:
-`python main.py`
+```shell
+python main.py
+```
 
-Build in the cloned repository:
+> Build in the cloned repository:
 
-`pyinstaller --onefile --hidden-import animdl --hidden-import pypresence  --icon logo.ico main.py`
+```shell
+pyinstaller --onefile --hidden-import animdl --hidden-import pypresence  --icon logo.ico main.py
+```
+
+### Directly
+
+> Run in the cloned repository:
+
+- Run the main.py file by double clicking it.
+
+> Built in the cloned repository:
+
+- Run the executable I've built or you've built by double clicking it.
 
 ## Requirements (building)
 

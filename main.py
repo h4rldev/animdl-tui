@@ -36,14 +36,14 @@ ANIMDL_DEFAULT = {
 }
 CONFIG_DEFAULT = {
     "modifiers":{
-        "dir": "",
+        "dir": "\\",
         "provider": "animixplay",
         "quality": "1080/best",
         "range": "1-89",
         "special": "latest-89"
     },
     "toggles":{
-        "dir": True,
+        "dir": False,
         "quality": True,
         "range": False,
         "special": False,
