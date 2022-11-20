@@ -12,13 +12,17 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 
 First working release!! (expect bugs)
 
-How to run:
+> How to run:
 
 ```shell
 git clone https://github.com/H4rldev/animdl-tui
 cd animdl-tui
 main.py
 ```
+
+> or:
+
+Download from the [releases](https://github.com/h4rldev/animdl-tui/releases)
 
 Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
