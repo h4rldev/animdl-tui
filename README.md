@@ -31,6 +31,7 @@ Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 - Web frontent for it
 - Code Cleanup
 - Less skill issues.
+- Mal/Anilist Sync
 
 ## Installation
 
