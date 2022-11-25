@@ -28,7 +28,8 @@ Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
 ## Todo
 
-- Web frontent for it
+- Web frontent for it (might deprecate due to issues with pyinstaller)
+- Upgrade the Update function to retrieve the latest release from Github
 - Code Cleanup
 - Less skill issues.
 - Mal/Anilist Sync
