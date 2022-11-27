@@ -896,15 +896,15 @@ def main():
                 )
                 sys.exit()
 
-        def web():
-            cursor.hide()
-            app = Flask(__name__)
+        #def web():
+        #    cursor.hide()
+        #    app = Flask(__name__)
 
-            @app.route("/")
-            def index():
-                return render_template('index.html')
+        #    @app.route("/")
+        #    def index():
+        #        return render_template('index.html')
 
-            app.run()
+        #    app.run()
 
         def stream():
             cursor.hide()
@@ -1198,7 +1198,7 @@ def main():
                     '- Grab    ',
                     '- Update  ',
                     '- Settings',
-                    '- Web (WIP/Not Working)',
+                    #'- Web (WIP/Not Working)',
                     '- Exit    '
                 ],
                 bullet = "",
@@ -1232,9 +1232,9 @@ def main():
                 case '- Settings':
                     clear()
                     thesettings()
-                case '- Web (WIP/Not Working)':
-                    clear()
-                    web()
+                #case '- Web (WIP/Not Working)':
+                #    clear()
+                #    web()
                 case '- Exit    ':
                     clear()
                     sys.exit()
