@@ -16,7 +16,7 @@ jobs:
       - name: "Build & test"
         run: |
           pip install pyinstaller
-          pyinstaller --onefile --icon logo.ico main.py
+          pyinstaller --onefile --icon .\logo.ico .\main.py
           echo "done!"
 
       - uses: "marvinpinto/action-automatic-releases@latest"
