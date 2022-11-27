@@ -16,7 +16,7 @@ jobs:
       - name: "Build & test"
         run: |
           pip install pyinstaller
-          pyinstaller --onefile --icon $(git ls-files '*.ico') $(git ls-files '*.py')
+          pyinstaller --onefile --icon '*.ico' '*.py'
           echo "done!"
 
       - uses: "marvinpinto/action-automatic-releases@latest"
