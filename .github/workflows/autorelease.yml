@@ -16,7 +16,7 @@ jobs:
       - name: "Build & test"
         run: |
           pip install pyinstaller
-          cd ..
+          cd $GITHUB_WORKSPACE
           pyinstaller --onefile --icon .\logo.ico .\main.py
           echo "done!"
 
