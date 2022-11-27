@@ -1,30 +1,25 @@
----
-name: "release"
+name: Package Application with Pyinstaller
 
 on:
   push:
-    branches:
-      - "main"
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  release:
-    name: "Release"
-    runs-on: "windows-latest"
+  build:
+
+    runs-on: windows-latest
 
     steps:
-      # ...
-      - name: "Build & test"
-        run: |
-          pip install pyinstaller
-          pyinstaller --onefile --icon 'icon.ico' 'main.py'
-          echo "done!"
+    - uses: actions/checkout@v2
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: false
-          title: "Automatic Build"
-          files: |
-            LICENSE.txt
-            *.exe
+    - name: Package Application
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: src
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: name-of-artifact
+        path: src/dist/windows
