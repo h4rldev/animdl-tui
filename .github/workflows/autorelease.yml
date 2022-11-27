@@ -17,7 +17,7 @@ jobs:
     - name: Package Application
       uses: JackMcKew/pyinstaller-action-windows@main
       with:
-        path: src
+        path: /h4rldev/animdl-tui
 
     - uses: actions/upload-artifact@v2
       with:
