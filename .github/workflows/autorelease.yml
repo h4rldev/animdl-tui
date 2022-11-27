@@ -16,7 +16,7 @@ jobs:
       - name: "Build & test"
         run: |
           pip install pyinstaller
-          cd $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE\animdl-tui
           pyinstaller --onefile --icon .\logo.ico .\main.py
           echo "done!"
 
