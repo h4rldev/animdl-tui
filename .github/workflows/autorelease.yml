@@ -16,8 +16,7 @@ jobs:
       - name: "Build & test"
         run: |
           pip install pyinstaller
-          cd $GITHUB_WORKSPACE\animdl-tui
-          pyinstaller --onefile --icon .\logo.ico .\main.py
+          pyinstaller --onefile --icon $(git ls-files '*.ico') $(git ls-files '*.py')
           echo "done!"
 
       - uses: "marvinpinto/action-automatic-releases@latest"
