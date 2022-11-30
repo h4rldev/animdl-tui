@@ -33,6 +33,8 @@ Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 - Code Cleanup
 - Less skill issues.
 - Mal/Anilist Sync
+- Compatibility with other oses
+- Gui in C and animdl rewrite in C (the funny)
 
 ## Installation
 
