@@ -10,8 +10,8 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 
 ## News
 
-The latest version of animdl-tui will be released soon
-and will probably be the most stable as of rn.
+The latest version of animdl-tui has been released
+and will probably be the most stable release as of rn.
 
 > How to run:
 
