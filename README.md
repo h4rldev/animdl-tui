@@ -34,7 +34,7 @@ Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 - Less skill issues.
 - Mal/Anilist Sync (If you're downloading only, use [taiga](https://taiga.moe/))
 - Compatibility with other oses
-- Gui in C and animdl rewrite in C (the funny)
+- animdl rewrite in rust (the funny)
 
 ## Installation
 
