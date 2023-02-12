@@ -29,7 +29,6 @@ Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
 ## Todo
 
-- Web frontent for it (might deprecate due to issues with pyinstaller)
 - Code Cleanup
 - Less skill issues.
 - Mal/Anilist Sync (If you're downloading only, use [taiga](https://taiga.moe/))
