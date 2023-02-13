@@ -3,219 +3,135 @@ import ctypes
 import os
 import random
 import sys
-import subprocess
-from msvcrt import getch as getkey
+
 from time import sleep
 
-import requests
-import readchar
+from modules.default_configs import ANIMDL_DEFAULT, CONFIG_DEFAULT
+from modules.checks import doespackageexist, ismoduleon, checkifexists, checkiffalse
+from modules.colors import cyan, green, red, yellow, blue, orange, purple, reset, bold
 import cursor
+import readchar
 import yaml as y
 from bullet import Bullet, Input, colors
 from click import clear
-from colored import attr, fg
-from flask import Flask, render_template
+
+if sys.platform == "win32":
+    # trunk-ignore(pylint/E0401)
+    from msvcrt import getch as getkey
+else:
+    import getch as getkey
+
 
 __version__ = "0.0.3"
 
-def checkforadmin():
-    """Checks if the user is admin"""
-    if sys.platform == 'win32':
-        return ctypes.windll.shell32.IsUserAnAdmin()
+EXECUTABLE: str = os.path.basename(sys.executable)
+ANIMDL: str = "[animdl-tui]"
 
-EXECUTABLE = os.path.basename(sys.executable)
-ANIMDL = "[animdl-tui]"
-ANIMDL_CONFIG = "animdl_config.yml"
-CONFIG_FILE = "config.yml"
-
-ANIMDL_DEFAULT = {
-    "default_player": "mpv",
-    "players": {
-        "mpv": {
-            "executable": "mpv",
-            "opts": []
-        }
-    },
-    "discord_presence": False
-}
-
-CONFIG_DEFAULT = {
-    "modifiers":{
-        "dir": "\\",
-        "provider": "animixplay",
-        "quality": "",
-        "range": "",
-        "special": ""
-    },
-    "toggles":{
-        "dir": False,
-        "quality": True,
-        "range": False,
-        "special": False,
-    }
-}
-
-def doespackageexist(package):
-    """Checks if a package exists"""
-    is_present = os.system(f"pip show {package}")
-    if is_present == 1:
-        return False
-    return True
-
-def ismoduleon(config_file, module: str):
-    """Checks if pypresence is enabled or not"""
-    with open(config_file, 'r', encoding="utf-8") as module_io:
-        module_check = y.safe_load(module_io)
-        if module_check[module] is True:
-            return module_check[module]
-        return False
-
-def checkifexists(file, mode, default_data):
-    """Checks if a file exists, if it doesn't it, it creates it and writes default data to it"""
-    if os.path.isfile(file) is False:
-        with open(file, mode, encoding="utf-8") as make_config_file:
-            y.dump(default_data, make_config_file)
-    else:
-        pass
-
-def checkiffalse(config, modifier: str):
-    """Checks if a modifier is false"""
-    with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
-        tui_config = y.safe_load(configfile_read)
-    with open(ANIMDL_CONFIG, 'r', encoding="utf-8") as animdl_config_read:
-        animdl_config = y.safe_load(animdl_config_read)
-
-    if config == animdl_config:
-        modifier_value = config[modifier]
-    else:
-        modifier_value = config["modifiers"][modifier]
-    if modifier != "provider" and config != animdl_config:
-        modifier_status = config["toggles"][modifier]
-
-    if modifier == "special":
-        modifier_name = "Special Range"
-    elif modifier == "default_player":
-        modifier_name = "Player"
-    else:
-        modifier_name = modifier.capitalize()
-
-    if config == tui_config:
-        if modifier == "provider":
-            return f" {modifier_name} is {cyan}{modifier_value}{reset}"
-        if config["toggles"][modifier] is False:
-            return f" {modifier_name} is {red}{modifier_status}{reset}"
-        return f" {modifier_name} is {cyan}{modifier_value}{reset}"
-    return f" {modifier_name} is {cyan}{modifier_value}{reset}"
-
-cyan = fg("cyan")
-reset = attr("reset")
-bold = attr("bold")
-green = fg("green")
-red = fg("red")
-blue = fg("blue")
-orange = fg("58")
-purple = fg("54")
-yellow = fg("yellow")
 randcolors = [cyan, green, red, blue, orange, purple, yellow]
+
+def confirmation(conf_prompt: str, choice1: str, choice2: str, color1=green, color2=red) -> bool:
+    """Makes a confirmation prompt and returns either true or false based on user choice."""
+    confirmation_bullet = Bullet(
+        prompt=f"{conf_prompt}",
+        choices=[
+            f'- {color1} {choice1} {colors.foreground["default"]}',
+            f'- {color2} {choice2} {colors.foreground["default"]}',
+        ],
+        bullet="",
+        margin=0,
+        align=1,
+        word_on_switch=colors.foreground["default"],
+        background_on_switch=colors.background["white"],
+    )
+    result = confirmation_bullet.launch()
+    if choice1 in result:
+        return True
+    return False
+
+def write_to_config(file: str, config, tree: str, key: str, value=""):
+    if value == "":
+        config[tree] = f"{key}"
+    else:
+        config[tree][key] = f"{value}"
+
+    with open(file, "w", encoding="utf-8") as buffer:
+        y.dump(config, buffer)
+
 
 def randcolforname(name):
     """Randomly changes the color of a string based on an array of values"""
     randomcolors = random.choice(randcolors)
     print(f"{bold}{randomcolors} {name}\n{reset}")
 
+
 def continue1():
     """Continue function"""
     print("\n Press any key to continue")
     getkey()
 
-def cts():
-    """Fixes actually nothing just convenient"""
-    clear()
-    thesettings()
-
-def c_m():
-    """Convenience"""
-    clear()
-    main()
-
-def cpts():
-    """"Fixes redundance and lint"""
-    clear()
-    print(" Ok! returning...")
-    thesettings()
-
 def thesettings():
     """settings function"""
     try:
         cursor.hide()
-        with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
-            tui_config = y.safe_load(configfile_read)
-        with open(ANIMDL_CONFIG, 'r', encoding="utf-8") as animdl_config_read:
-            animdl_config = y.safe_load(animdl_config_read)
-        def special():
-            settings_special_status = checkiffalse(tui_config, "special")
+        with open("config.yml", "r", encoding="utf-8") as configfile_read:
+            tui_read_config = y.safe_load(configfile_read)
+        with open("animdl_config.yml", "r", encoding="utf-8") as animdl_config_read:
+            animdl_read_config = y.safe_load(animdl_config_read)
+
+        def _special():
+            settings_special_status = checkiffalse(tui_read_config, "special")
             cursor.hide()
             randomnumber = random.randint(0, 1000)
-            randcolforname(ANIMDL)
-            special_range = Bullet(
-                prompt = f"{cyan} Are you sure you want a special range? {reset} \n"
+            randcolforname("[animdl-tui]")
+            special = confirmation(
+                f"{cyan} Are you sure you want a special range? {reset} \n"
                 f" {settings_special_status}\n",
-                choices = [
-                    f'- {green}Yes {colors.foreground["default"]}',
-                    f'- {red}No  {colors.foreground["default"]}',
-                ],
-                bullet = "",
-                margin = 0,
-                align = 1,
-                word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                "Yes",
+                "No"
             )
-            result = special_range.launch()
-            if result == f"- {green}Yes {colors.foreground['default']}":
+            if special:
                 clear()
-                randcolforname(ANIMDL)
-                special_range_input = Input(
-                    prompt = (f"{cyan} Specify a special range.{reset}"
-                            f" (Example: \"latest-{randomnumber}\")\n"
-                            f" {red}:{reset} "),
-                    pattern = "latest-"
+                randcolforname("[animdl-tui]")
+                special_input = Input(
+                    prompt=(
+                        f"{cyan} Specify a special range.{reset}"
+                        f' (Example: "latest-{randomnumber}")\n'
+                        f" {red}:{reset} "
+                    ),
+                    pattern="latest-",
                 )
 
-                special_range_input_result = special_range_input.launch()
-                if tui_config['toggles']['special'] is True:
-                    print(
-                        f" ´SPECIAL RANGE´ is now '{special_range_input_result}'")
-                    tui_config['modifiers']['special'] = f'{special_range_input_result}'
-                    with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                        y.dump(tui_config, configfile_write)
-                        sleep(1)
-                        cts()
+                special_input_result = special_input.launch()
+                if tui_read_config["modifiers"]["special"] is True:
+                    print(f" ´SPECIAL RANGE´ is now '{special_input_result}'")
+                    write_to_config(
+                        "config.yml",
+                        tui_read_config,
+                        "modifiers",
+                        "special",
+                        special_input_result
+                    )
+                    continue1()
+                    thesettings()
 
                 else:
                     print(" ´SPECIAL RANGE´ is False")
-                    special_toggle = Bullet(
-                        prompt = (f"{cyan} Would you like to enable ´SPECIAL RANGE´? {reset} \n"),
-                        choices = [
-                            f'- {green}Yes {colors.foreground["default"]}',
-                            f'- {red}No  {colors.foreground["default"]}',
-                        ],
-                        bullet = "",
-                        margin = 0,
-                        align = 1,
-                        word_on_switch = colors.foreground["default"],
-                        background_on_switch = colors.background["white"]
+                    special_toggle = confirmation(
+                        f"{cyan} Would you like to enable ´SPECIAL RANGE´? {reset} \n",
+                        "Yes",
+                        "No"
                     )
-                    special_toggle_result = special_toggle.launch()
-                    if special_toggle_result == f"- {green}Yes {colors.foreground['default']}":
+                    if special_toggle:
                         print(" ´SPECIAL RANGE´ is now True")
-                        tui_config['toggles']['special'] = True
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile:
-                            y.dump(tui_config, configfile)
-                        print(
-                            f" ´SPECIAL RANGE´ is now '{special_range_input_result}'")
-                        tui_config['modifiers']['range'] = f'{special_range_input_result}'
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        write_to_config("config.yml", tui_read_config, "toggles", "special", True)
+                        print(f" ´SPECIAL RANGE´ is now '{special_input_result}'")
+                        write_to_config(
+                            "config.yml",
+                            tui_read_config,
+                            "modifiers",
+                            "special",
+                            special_input_result
+                        )
                         sleep(1)
                         cts()
                     else:
@@ -223,70 +139,65 @@ def thesettings():
             else:
                 cpts()
 
-        def therange():
-            settings_range_status = checkiffalse(tui_config, "range")
+        def _range():
+            settings_range_status = checkiffalse(tui_read_config, "range")
             cursor.hide()
             randomnumber = random.randint(0, 1000)
-            randcolforname(ANIMDL)
-            specific_range = Bullet(
-                prompt = f"{cyan} Are you sure you want a specific range? {reset} \n"
+            randcolforname("[animdl-tui]")
+            _range = confirmation(
+                f"{cyan} Are you sure you want a range? {reset} \n"
                 f" {settings_range_status}\n",
-                choices = [
-                    f'- {green}Yes {colors.foreground["default"]}',
-                    f'- {red}No  {colors.foreground["default"]}',
-                ],
-                bullet = "",
-                margin = 0,
-                align = 1,
-                word_on_switch = colors.foreground["default"],
-                background_on_switch = colors.background["white"]
+                "Yes",
+                "No"
             )
-            result = specific_range.launch()
-            if result == f"- {green}Yes {colors.foreground['default']}":
+            if _range:
                 clear()
-                randcolforname(ANIMDL)
-                specific_range_input = Input(
-                    prompt = (f"{cyan}Specify a range.{reset}"
-                            f" (Example: \"{randomnumber}-{randomnumber}\")"
-                            f"\n {red}:{reset} "),
+                randcolforname("[animdl-tui]")
+                range_input = Input(
+                    prompt=(
+                        f"{cyan}Specify a range.{reset}"
+                        f' (Example: "{randomnumber}-{randomnumber}")'
+                        f"\n {red}:{reset} "
+                    ),
                 )
 
-                specific_range_input_result = specific_range_input.launch()
-                if tui_config['toggles']['range'] is True:
-                    print(f"´RANGE´ is now {specific_range_input_result}")
-                    tui_config['modifiers']['range'] = f'{specific_range_input_result}'
-                    with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                        y.dump(tui_config, configfile_write)
+                range_input_result = range_input.launch()
+                if tui_read_config["toggles"]["range"] is True:
+                    print(f"´RANGE´ is now {range_input_result}")
+                    write_to_config(
+                        "config.yml",
+                        tui_read_config,
+                        "modifiers",
+                        "range",
+                        range_input_result
+                    )
                     sleep(1)
                     cts()
 
                 else:
                     print("´RANGE´ is False")
-                    specific_range_toggle = Bullet(
-                        prompt = f"{cyan} Would you like to enable ´RANGE´? {reset} \n",
-                        choices = [
-                            f'- {green}Yes {colors.foreground["default"]}',
-                            f'- {red}No  {colors.foreground["default"]}',
-                        ],
-                        bullet = "",
-                        margin = 0,
-                        align = 1,
-                        word_on_switch = colors.foreground["default"],
-                        background_on_switch = colors.background["white"]
+                    range_toggle = confirmation(
+                        f"{cyan} Would you like to enable ´RANGE´? {reset} \n",
+                        "Yes",
+                        "No"
                     )
-                    specific_range_toggle_result = specific_range_toggle.launch()
-                    if specific_range_toggle_result == (
-                        f"- {green}Yes {colors.foreground['default']}"
-                        ):
+                    if range_toggle:
                         print(" ´RANGE´ is now True")
-                        tui_config['toggles']['range'] = True
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
-                        print(
-                            f" ´RANGE´ is now {specific_range_input_result}")
-                        tui_config['modifiers']['range'] = f'{specific_range_input_result}'
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        write_to_config(
+                            "config.yml",
+                            tui_read_config,
+                            "toggles",
+                            "range",
+                            range_input_result
+                        )
+                        print(f" ´RANGE´ is now {range_input_result}")
+                        write_to_config (
+                            "config.yml",
+                            tui_read_config,
+                            "modifiers",
+                            "range",
+                            range_input_result
+                        )
                         sleep(1)
                         cts()
                     else:
@@ -295,65 +206,56 @@ def thesettings():
                 cpts()
 
         def quality():
-            settings_quality_status = checkiffalse(tui_config, "quality")
+            settings_quality_status = checkiffalse(tui_read_config, "quality")
             cursor.hide()
-            randcolforname(ANIMDL)
-            quality = Bullet(
-                prompt = f"{cyan} Are you sure you want a specific quality? {reset} \n"
+            randcolforname("[animdl-tui]")
+            quality = confirmation(
+                f"{cyan} Are you sure you want a specific quality? {reset} \n"
                 f" {settings_quality_status}\n",
-                choices = [
-                    f'- {green}Yes {colors.foreground["default"]}',
-                    f'- {red}No  {colors.foreground["default"]}',
-                ],
-                bullet = "",
-                margin = 0,
-                align = 1,
-                word_on_switch = colors.foreground["default"],
-                background_on_switch = colors.background["white"],
+                "Yes",
+                "No"
             )
-            result = quality.launch()
-            if result == f"- {green}Yes {colors.foreground['default']}":
+            if quality:
                 clear()
-                randcolforname(ANIMDL)
+                randcolforname("[animdl-tui]")
                 quality_input = Input(
-                    prompt = (f"{cyan} Specify a quality.{reset}"
-                    f" (Examples: '1080', '1080/best', '1080/worst',"
-                    f" 'best[title]', 'best[title=r'^DUB']')"
-                    f"\n {red}:{reset} "),
+                    prompt=(
+                        f"{cyan} Specify a quality.{reset}"
+                        f" (Examples: '1080', '1080/best', '1080/worst',"
+                        f" 'best[title]', 'best[title=r'^DUB']')"
+                        f"\n {red}:{reset} "
+                    ),
                 )
                 quality_input_result = quality_input.launch()
-                if tui_config['toggles']['quality'] is True:
+                if tui_read_config["toggles"]["quality"] is True:
                     print(f" ´QUALITY´ is now {quality_input_result}")
-                    tui_config['modifiers']['quality'] = f'{quality_input_result}'
-                    with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                        y.dump(tui_config, configfile_write)
+                    tui_read_config["modifiers"]["quality"] = f"{quality_input_result}"
+                    with open("config.yml", "w", encoding="utf-8") as configfile_write:
+                        y.dump(tui_read_config, configfile_write)
                     sleep(1)
                     cts()
                 else:
                     print(" ´QUALITY´ is False")
-                    quality_toggle = Bullet(
-                        prompt = f"{cyan} Would you like to enable ´QUALITY´? {reset} \n",
-                        choices = [
-                            f'- {green}Yes {colors.foreground["default"]}',
-                            f'- {red}No  {colors.foreground["default"]}',
-                        ],
-                        bullet = "",
-                        margin = 0,
-                        align = 1,
-                        word_on_switch = colors.foreground["default"],
-                        background_on_switch = colors.background["white"]
+                    quality_toggle = confirmation(
+                        f"{cyan} Would you like to enable ´QUALITY´? {reset} \n",
+                        "Yes",
+                        "No"
                     )
-                    quality_toggle_result = quality_toggle.launch()
-                    if quality_toggle_result == f"- {green}Yes {colors.foreground['default']}":
+                    if quality_toggle:
                         print(" ´QUALITY´ is now True")
-                        tui_config['toggles']['quality'] = True
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
-                            print(
-                                f" ´QUALITY´ is now {quality_input_result}")
-                            tui_config['modifiers']['quality'] = f'{quality_input_result}'
-                            with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                                y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["quality"] = True
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
+                            print(f" ´QUALITY´ is now {quality_input_result}")
+                            tui_read_config["modifiers"][
+                                "quality"
+                            ] = f"{quality_input_result}"
+                            with open(
+                                "config.yml", "w", encoding="utf-8"
+                            ) as configfile_write:
+                                y.dump(tui_read_config, configfile_write)
                                 sleep(1)
                                 cts()
                     else:
@@ -362,258 +264,238 @@ def thesettings():
                 cpts()
 
         def player():
-            settings_player_status = checkiffalse(animdl_config, "default_player")
+            settings_player_status = checkiffalse(animdl_read_config, "default_player")
             cursor.hide()
-            randcolforname(ANIMDL)
-            player = Bullet(
-                prompt = (f"{cyan}"
-                f" Are you sure you want to switch to a different player?{reset}"
-                f" \n (default: mpv) \n {settings_player_status}\n"),
-                choices = [
-                    f'- {green}Yes {colors.foreground["default"]}',
-                    f'- {red}No  {colors.foreground["default"]}',
-                ],
-                bullet = "",
-                margin = 0,
-                align = 1,
-                word_on_switch = colors.foreground["default"],
-                background_on_switch = colors.background["white"]
+            randcolforname("[animdl-tui]")
+            player = confirmation(
+                (
+                    f"{cyan}"
+                    f" Are you sure you want to switch to a different player?{reset}"
+                    f" \n (default: mpv) \n {settings_player_status}\n"
+                ),
+                "Yes",
+                "No"
             )
-            result = player.launch()
-            if result == f"- {green}Yes {colors.foreground['default']}":
+            if player:
                 clear()
-                randcolforname(ANIMDL)
+                randcolforname("[animdl-tui]")
                 player_choice = Bullet(
-                    prompt = f"{cyan} Choose a player. {reset} \n",
-                    choices = [
-                        '- mpv (default)  ',
-                        '- vlc            ',
-                        '- ffplay (ffmpeg)',
-                        '- exit           '
+                    prompt=f"{cyan} Choose a player. {reset} \n",
+                    choices=[
+                        "- mpv (default)  ",
+                        "- vlc            ",
+                        "- ffplay (ffmpeg)",
+                        "- exit           ",
                     ],
-                    bullet = "",
-                    margin = 0,
-                    align = 1,
-                    word_on_switch = colors.foreground["default"],
-                    background_on_switch = colors.background["cyan"]
+                    bullet="",
+                    margin=0,
+                    align=1,
+                    word_on_switch=colors.foreground["default"],
+                    background_on_switch=colors.background["cyan"],
                 )
                 player_choice_result = player_choice.launch()
                 match player_choice_result:
-                    case '- mpv (default)  ':
+                    case "- mpv (default)  ":
                         data = {
                             "default_player": "mpv",
-                            "players": {
-                                "mpv": {
-                                    "executable": "mpv",
-                                    "opts": []
-                                }
-                            }
+                            "players": {"mpv": {"executable": "mpv", "opts": []}},
                         }
                         print(" mpv should now be the selected player.")
 
-                        with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
+                        with open(
+                            "animdl_config.yml", "w", encoding="utf-8"
+                        ) as animdl_config_write:
                             y.dump(data, animdl_config_write)
                         sleep(1)
                         cts()
 
-                    case '- vlc            ':
+                    case "- vlc            ":
                         data = {
                             "default_player": "vlc",
-                            "players": {
-                                "vlc": {
-                                    "executable": "vlc",
-                                    "opts": []
-                                }
-                            }
+                            "players": {"vlc": {"executable": "vlc", "opts": []}},
                         }
 
                         print(" vlc should now be the selected player.")
 
-                        with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
+                        with open(
+                            "animdl_config.yml", "w", encoding="utf-8"
+                        ) as animdl_config_write:
                             y.dump(data, animdl_config_write)
                         sleep(1)
                         cts()
 
-
-                    case '- ffplay (ffmpeg)':
+                    case "- ffplay (ffmpeg)":
                         data = {
                             "default_player": "ffplay",
-                            "players": {
-                                "ffplay": {
-                                    "executable": "ffplay",
-                                    "opts": []
-                                }
-                            }
+                            "players": {"ffplay": {"executable": "ffplay", "opts": []}},
                         }
 
                         print(" ffplay should now be the selected player.")
 
-                        with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
+                        with open(
+                            "animdl_config.yml", "w", encoding="utf-8"
+                        ) as animdl_config_write:
                             y.dump(data, animdl_config_write)
                         sleep(1)
                         cts()
 
-                    case '- exit           ':
+                    case "- exit           ":
                         cts()
             else:
                 cpts()
 
         def provider():
-            settings_provider_status = checkiffalse(tui_config, "provider")
+            settings_provider_status = checkiffalse(tui_read_config, "provider")
             cursor.hide()
-            randcolforname(ANIMDL)
-            provider = Bullet(
-                prompt = (f"{cyan} Are you sure you want to"
-                f" switch to a different provider? {reset}\n"
-                f" (default: animixplay) \n"
-                f" {settings_provider_status} \n"),
-                choices = [
-                    f'- {green}Yes {colors.foreground["default"]}',
-                    f'- {red}No  {colors.foreground["default"]}',
-                ],
-                bullet = "",
-                margin = 0,
-                align = 1,
-                word_on_switch = colors.foreground["default"],
-                background_on_switch = colors.background["white"]
+            randcolforname("[animdl-tui]")
+            provider = confirmation(
+                (
+                    f"{cyan} Are you sure you want to"
+                    f" switch to a different provider? {reset}\n"
+                    f" (default: animixplay) \n"
+                    f" {settings_provider_status} \n"
+                ),
+                "Yes",
+                "No"
             )
-            result = provider.launch()
-            if result == f"- {green}Yes {colors.foreground['default']}":
+            if provider:
                 clear()
-                randcolforname(ANIMDL)
+                randcolforname("[animdl-tui]")
                 provider_choice = Bullet(
-                    prompt = f"{cyan} Choose a provider {reset} (sorted by latency). \n",
-                    choices = [
-                        '- animixplay (default)',
-                        '- animepahe           ',
-                        '- haho (NSFW)         ',
-                        '- gogoanime           ',
-                        '- tenshi.moe          ',
-                        '- allanime            ',
-                        '- exit                '
-                        ],
-                    bullet = "",
-                    margin = 0,
-                    align = 1,
+                    prompt=f"{cyan} Choose a provider {reset} (sorted by latency). \n",
+                    choices=[
+                        "- animixplay (default)",
+                        "- animepahe           ",
+                        "- haho (NSFW)         ",
+                        "- gogoanime           ",
+                        "- tenshi.moe          ",
+                        "- allanime            ",
+                        "- exit                ",
+                    ],
+                    bullet="",
+                    margin=0,
+                    align=1,
                     word_on_switch=colors.foreground["default"],
-                    background_on_switch=colors.background["cyan"]
+                    background_on_switch=colors.background["cyan"],
                 )
                 provider_choice_result = provider_choice.launch()
 
                 match provider_choice_result:
-
-                    case '- animixplay (default)':
+                    case "- animixplay (default)":
                         print(" The provider has now been set to animixplay.")
-                        tui_config['modifiers']['provider'] = 'animixplay'
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["modifiers"]["provider"] = "animixplay"
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         sleep(1)
                         cts()
 
-                    case '- animepahe           ':
+                    case "- animepahe           ":
                         print(" The provider has now been set to animepahe.")
-                        tui_config['modifiers']['provider'] = 'animepahe'
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["modifiers"]["provider"] = "animepahe"
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         sleep(1)
                         cts()
 
-                    case '- haho (NSFW)         ':
+                    case "- haho (NSFW)         ":
                         print(" The provider has now been set to haho (NSFW).")
-                        tui_config['modifiers']['provider'] = 'haho'
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["modifiers"]["provider"] = "haho"
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         sleep(1)
                         cts()
 
-                    case '- gogoanime           ':
+                    case "- gogoanime           ":
                         print(" The provider has now been set to gogoanime.")
-                        tui_config['modifiers']['provider'] = 'gogoanime'
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["modifiers"]["provider"] = "gogoanime"
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         sleep(1)
                         cts()
 
-                    case '- tenshi.moe          ':
+                    case "- tenshi.moe          ":
                         print(" The provider has now been set to tenshi.moe.")
-                        tui_config['modifiers']['provider'] = 'tenshi'
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["modifiers"]["provider"] = "tenshi"
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         sleep(1)
                         cts()
 
-                    case '- allanime            ':
+                    case "- allanime            ":
                         print(" The provider has now been set to allanime.")
-                        tui_config['modifiers']['provider'] = 'allanime'
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["modifiers"]["provider"] = "allanime"
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         sleep(1)
                         cts()
 
-                    case '- exit                ':
+                    case "- exit                ":
                         cts()
             else:
                 cpts()
 
+        def stylize_bool_in_config(config, tree, key):
+            if key == "":
+                if config[tree]:
+                    return f"{green} True"
+                return f"{red} False"
+
+            if config[tree][key]:
+                return f"{green} True"
+            return f"{red} False"
+
         def toggle():
             cursor.hide()
             clear()
-            if animdl_config['discord_presence'] is False:
-                presencestatus = 'False'
-                presencestatuscolor = red
-            else:
-                presencestatus = 'True'
-                presencestatuscolor = green
-            if tui_config['toggles']['special'] is False:
-                specialstatus = 'False'
-                specialstatuscolor = red
-            else:
-                specialstatus = 'True'
-                specialstatuscolor = green
+            qualitychoice = (
+                "- QUALITY ="
+                f"{stylize_bool_in_config(tui_read_config, 'toggles', 'quality'):5}"
+            )
+            dirchoice = (
+                "- DIR ="
+                f"{stylize_bool_in_config(tui_read_config, 'toggles', 'dir'):5}"
+            )
+            rangechoice = (
+                "- RANGE ="
+                f"{stylize_bool_in_config(tui_read_config, 'toggles', 'range'):5}"
+            )
+            specialchoice = (
+                "- SPECIAL RANGE ="
+                f"{stylize_bool_in_config(tui_read_config, 'toggles', 'special'):5}"
+            )
+            presencechoice = (
+                "- DISCORD PRESENCE ="
+                f"{stylize_bool_in_config(animdl_read_config, 'discord_presence', ''):5}"
+            )
 
-            if tui_config['toggles']['range'] is False:
-                rangestatus = 'False'
-                rangestatuscolor = red
-            else:
-                rangestatus = 'True'
-                rangestatuscolor = green
-
-            if tui_config['toggles']['quality'] is False:
-                qualitystatus = 'False'
-                qualitystatuscolor = red
-            else:
-                qualitystatus = 'True'
-                qualitystatuscolor = green
-
-            if tui_config['toggles']['dir'] is False:
-                dirstatus = 'False'
-                dirstatuscolor = red
-            else:
-                dirstatus = 'True'
-                dirstatuscolor = green
-
-            qualitychoice = f'- QUALITY = {qualitystatuscolor}{qualitystatus:5}'
-            dirchoice = f'- DIR = {dirstatuscolor}{dirstatus:5}'
-            rangechoice = f'- RANGE = {rangestatuscolor}{rangestatus:5}'
-            specialchoice = f'- SPECIAL RANGE = {specialstatuscolor}{specialstatus:5}'
-            presencechoice = f'- DISCORD PRESENCE = {presencestatuscolor}{presencestatus:5}'
-
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
             modules = Bullet(
-                prompt = f"{cyan} Toggle modules: {reset} \n",
-                choices = [
-                    f'{qualitychoice}',
-                    f'{dirchoice}',
-                    f'{rangechoice}',
-                    f'{specialchoice}',
-                    f'{presencechoice}',
-                    '- Exit    '
+                prompt=f"{cyan} Toggle modules: {reset} \n",
+                choices=[
+                    f"{qualitychoice}",
+                    f"{dirchoice}",
+                    f"{rangechoice}",
+                    f"{specialchoice}",
+                    f"{presencechoice}",
+                    "- Exit    ",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
-                word_on_switch = colors.foreground["default"],
-                background_on_switch = colors.background["cyan"]
+                bullet="",
+                margin=0,
+                align=1,
+                word_on_switch=colors.foreground["default"],
+                background_on_switch=colors.background["cyan"],
             )
             result = modules.launch()
 
@@ -629,82 +511,106 @@ def thesettings():
                 result = 4
 
             match result:
-                case '- Exit    ':
+                case "- Exit    ":
                     cts()
 
                 case 0:
-                    if tui_config['toggles']['quality'] is True:
+                    if tui_read_config["toggles"]["quality"] is True:
                         print(" ´QUALITY´ is now False")
-                        tui_config['toggles']['quality'] = False
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["quality"] = False
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         toggle()
                     else:
                         print(" ´QUALITY´ is now True")
-                        tui_config['toggles']['quality'] = True
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["quality"] = True
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         toggle()
                 case 1:
-                    if tui_config['toggles']['dir'] is True:
+                    if tui_read_config["toggles"]["dir"] is True:
                         print(" ´DIR´ is now False")
-                        tui_config['toggles']['dir'] = False
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["dir"] = False
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         toggle()
                     else:
                         print(" ´DIR´ is now True")
-                        tui_config['toggles']['dir'] = True
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["dir"] = True
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         toggle()
                 case 2:
-                    if tui_config['toggles']['range'] is True:
+                    if tui_read_config["toggles"]["range"] is True:
                         print(" ´RANGE´ is now False")
-                        tui_config['toggles']['range'] = False
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["range"] = False
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         toggle()
                     else:
                         print(" ´RANGE´ is now True")
-                        tui_config['toggles']['range'] = True
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["range"] = True
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         toggle()
                 case 3:
-                    if tui_config['toggles']['special'] is True:
+                    if tui_read_config["toggles"]["special"] is True:
                         print(" ´SPECIAL RANGE´ is now False")
-                        tui_config['toggles']['special'] = False
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["special"] = False
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         toggle()
                     else:
                         print(" ´SPECIAL RANGE´ is now True")
-                        tui_config['toggles']['special'] = True
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                            y.dump(tui_config, configfile_write)
+                        tui_read_config["toggles"]["special"] = True
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
+                            y.dump(tui_read_config, configfile_write)
                         toggle()
                 case 4:
-                    if animdl_config['discord_presence'] is True:
+                    if animdl_read_config["discord_presence"] is True:
                         print(" ´DISCORD PRESENCE´ is now False")
-                        animdl_config['discord_presence'] = False
-                        with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
-                            y.dump(animdl_config, animdl_config_write)
+                        animdl_read_config["discord_presence"] = False
+                        with open(
+                            "animdl_config.yml", "w", encoding="utf-8"
+                        ) as animdl_config_write:
+                            y.dump(animdl_read_config, animdl_config_write)
                         toggle()
                     else:
                         print(" ´DISCORD PRESENCE´ is now True")
-                        animdl_config['discord_presence'] = True
-                        with open(ANIMDL_CONFIG, 'w', encoding="utf-8") as animdl_config_write:
-                            y.dump(animdl_config, animdl_config_write)
-                        if doespackageexist("pypresence") is True and ismoduleon(
-                        ANIMDL_CONFIG,
-                        "discord_presence"
-                        ) is True:
+                        animdl_read_config["discord_presence"] = True
+                        with open(
+                            "animdl_config.yml", "w", encoding="utf-8"
+                        ) as animdl_config_write:
+                            y.dump(animdl_read_config, animdl_config_write)
+                        if (
+                            doespackageexist("pypresence") is True
+                            and ismoduleon("animdl_config.yml", "discord_presence") is True
+                        ):
                             toggle()
 
                         else:
-                            print("Whoops, doesn't look like you have pypresence installed.")
-                            print("Please install it manually or by pressing enter. Thanks")
+                            print(
+                                "Whoops, doesn't look like you have pypresence installed."
+                            )
+                            print(
+                                "Please install it manually or by pressing enter. Thanks"
+                            )
                             continue1()
                             if os.path.isfile("pypresence.txt") is True:
                                 print(
@@ -712,9 +618,8 @@ def thesettings():
                                     "Please report it to me on github.com"
                                 )
                             else:
-                                with open("pypresence.txt",
-                                    "a",
-                                    encoding="utf-8"
+                                with open(
+                                    "pypresence.txt", "a", encoding="utf-8"
                                 ) as pypresence_signal2:
                                     pypresence_signal2.write("pypresence installus")
                                     print(
@@ -727,68 +632,57 @@ def thesettings():
                                     sys.executable,
                                     " ".join(sys.argv),
                                     None,
-                                    1
+                                    1,
                                 )
                                 sys.exit()
 
         def directory():
-            settings_dir_status = checkiffalse(tui_config, "dir")
+            settings_dir_status = checkiffalse(tui_read_config, "dir")
             cursor.hide()
-            randcolforname(ANIMDL)
-            directory = Bullet(
-                prompt = f"{cyan} Are you sure you want a specific directory? {reset} \n"
+            randcolforname("[animdl-tui]")
+            directory = confirmation(
+                f"{cyan} Are you sure you want a specific directory? {reset} \n"
                 f" {settings_dir_status} \n",
-                choices = [
-                    f'- {green}Yes {colors.foreground["default"]}',
-                    f'- {red}No  {colors.foreground["default"]}',
-                ],
-                bullet = "",
-                margin = 0,
-                align = 1,
-                word_on_switch = colors.foreground["default"],
-                background_on_switch = colors.background["white"]
+                "Yes",
+                "No"
             )
-            result = directory.launch()
-            if result == f"- {green}Yes {colors.foreground['default']}":
+            if directory:
                 clear()
-                randcolforname(ANIMDL)
+                randcolforname("[animdl-tui]")
                 dir_input = Input(
-                    prompt = (f"{cyan} Enter a vaild directory. (Example: 'C:\\Users\\'){reset}"
-                    f"\n {red}:{reset} "),
-                    indent = 0,
+                    prompt=(
+                        f"{cyan} Enter a vaild directory. (Example: 'C:\\Users\\'){reset}"
+                        f"\n {red}:{reset} "
+                    ),
+                    indent=0,
                 )
                 dir_input_result = dir_input.launch()
-                if tui_config['toggles']['dir'] is True:
+                if tui_read_config["toggles"]["dir"] is True:
                     print(f" ´DIR´ is now {dir_input_result}")
-                    tui_config['modifiers']['dir'] = f'{dir_input_result}'
-                    with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
-                        y.dump(tui_config, configfile_write)
+                    tui_read_config["modifiers"]["dir"] = f"{dir_input_result}"
+                    with open("config.yml", "w", encoding="utf-8") as configfile_write:
+                        y.dump(tui_read_config, configfile_write)
                     sleep(1)
                     cts()
                 else:
                     print(" ´DIR´ is False")
                     dir_toggle = Bullet(
-                        prompt = f"{green} - Would you like to enable ´DIR´? {reset} \n",
-                        choices = [
-                            f'- {green}Yes {colors.foreground["default"]}',
-                            f'- {red}No  {colors.foreground["default"]}',
-                        ],
-                        bullet = "",
-                        margin = 0,
-                        align = 1,
-                        word_on_switch = colors.foreground["default"],
-                        background_on_switch = colors.background["white"]
+                        f"{green} - Would you like to enable ´DIR´? {reset} \n",
+                        "Yes",
+                        "No"
                     )
-                    dir_toggle_result = dir_toggle.launch()
-                    if dir_toggle_result == f"- {green}Yes {colors.foreground['default']}":
+                    if dir_toggle:
                         print(" ´DIR´ is now True")
-                        tui_config['toggles']['dir'] = True
-                        with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
+                        tui_config["toggles"]["dir"] = True
+                        with open(
+                            "config.yml", "w", encoding="utf-8"
+                        ) as configfile_write:
                             y.dump(tui_config, configfile_write)
-                            print(
-                                f" ´DIR´ is now {dir_input_result}")
-                            tui_config['modifiers']['dir'] = f'"{dir_input_result}"'
-                            with open(CONFIG_FILE, 'w', encoding="utf-8") as configfile_write:
+                            print(f" ´DIR´ is now {dir_input_result}")
+                            tui_config["modifiers"]["dir"] = f'"{dir_input_result}"'
+                            with open(
+                                "config.yml", "w", encoding="utf-8"
+                            ) as configfile_write:
                                 y.dump(tui_config, configfile_write)
                                 sleep(1)
                                 cts()
@@ -798,127 +692,78 @@ def thesettings():
                 cpts()
 
         clear()
-        randcolforname(ANIMDL)
+        randcolforname("[animdl-tui]")
         settings = Bullet(
-            prompt = f"{green} Settings: {reset} \n",
-            choices = [
-                '- Toggle  ',
-                '- Provider',
-                '- Player  ',
-                '- Quality ',
-                '- Range   ',
-                '- Special ',
-                '- Dir     ',
-                '- Exit    '
+            prompt=f"{green} Settings: {reset} \n",
+            choices=[
+                "- Toggle  ",
+                "- Provider",
+                "- Player  ",
+                "- Quality ",
+                "- Range   ",
+                "- Special ",
+                "- Dir     ",
+                "- Exit    ",
             ],
-            bullet = "",
-            margin = 0,
-            align = 1,
-            word_on_switch = colors.foreground["default"],
-            background_on_switch = colors.background["cyan"]
+            bullet="",
+            margin=0,
+            align=1,
+            word_on_switch=colors.foreground["default"],
+            background_on_switch=colors.background["cyan"],
         )
         result = settings.launch()
         match result:
-            case '- Toggle  ':
+            case "- Toggle  ":
                 clear()
                 toggle()
-            case '- Provider':
+            case "- Provider":
                 clear()
                 provider()
-            case '- Player  ':
+            case "- Player  ":
                 clear()
                 player()
-            case '- Quality ':
+            case "- Quality ":
                 clear()
                 quality()
-            case '- Range   ':
+            case "- Range   ":
                 clear()
-                therange()
-            case '- Special ':
+                _range()
+            case "- Special ":
                 clear()
-                special()
-            case '- Dir     ':
+                _special()
+            case "- Dir     ":
                 clear()
                 directory()
-            case '- Exit    ':
+            case "- Exit    ":
                 clear()
                 main()
     except KeyboardInterrupt:
         print("Are you sure you want to exit the terminal? (Y/N)")
         decision = readchar.readchar()
         match decision:
-            case 'y':
+            case "y":
                 sys.exit()
-            case 'n':
+            case "n":
                 continue1()
+
 
 def main():
     """main function"""
     try:
         cursor.hide()
-        def update():
-            """update function"""
-            print(' Checking for latest animdl-tui release on GitHub...')
-            req = requests.get(
-                'https://api.github.com/repos/h4rldev/animdl-tui/releases/latest', timeout=1
-            )
-            if req.status_code == 200:
-                if req.json()['tag_name'] > __version__:
-                    print(' New version available.')
-                    print(' Updating...')
-                    subprocess.call(
-                        ('powershell.exe -Command Invoke-WebRequest -URI '
-                        '"https://github.com/h4rldev/animdl-tui/releases/latest/download/main.exe" '
-                        f'-OutFile .\\{EXECUTABLE}.updated | exit'),
-                        creationflags=subprocess.CREATE_NEW_CONSOLE
-                        )
-                    print(' Update complete, please replace the old executable with the new one.')
-                else:
-                    print(' No update available lol.')
-                    continue1()
-            else:
-                print(' Failed to check for latest release.')
-
-            print(' Trying to update animdl...')
-            if os.path.isfile("update.txt") is True:
-                print(" Seems like you encountered a bug. Please report it to me on github.com")
-            else:
-                with open("update.txt", "a", encoding="utf-8") as update_signal:
-                    update_signal.write("updatus")
-                    print(" animdl will try to update on next startup of animdl-tui")
-                ctypes.windll.shell32.ShellExecuteW(
-                    None,
-                    "runas",
-                    sys.executable,
-                    " ".join(sys.argv),
-                    None,
-                    1
-                )
-                sys.exit()
-
-        #def web():
-        #    cursor.hide()
-        #    app = Flask(__name__)
-
-        #    @app.route("/")
-        #    def index():
-        #        return render_template('index.html')
-
-        #    app.run()
-
         def stream():
             cursor.hide()
-            with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+            with open("config.yml", "r", encoding="utf-8") as configfile_read:
                 tui_config = y.safe_load(configfile_read)
-            with open(ANIMDL_CONFIG, 'r', encoding="utf-8") as animdl_configfile_read:
+            with open("animdl_config.yml", "r", encoding="utf-8") as animdl_configfile_read:
                 animdl_config = y.safe_load(animdl_configfile_read)
 
-            qualityarg = tui_config['modifiers']['quality']
+            qualityarg = tui_config["modifiers"]["quality"]
             rangearg = f"-r {tui_config['modifiers']['range']}"
             specialarg = f"-s {tui_config['modifiers']['special']}"
-            provider = tui_config['modifiers']['provider']
+            provider = tui_config["modifiers"]["provider"]
 
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
 
             print(checkiffalse(tui_config, "quality"))
             print(checkiffalse(tui_config, "range"))
@@ -926,44 +771,45 @@ def main():
             print(checkiffalse(animdl_config, "default_player"))
             print(checkiffalse(tui_config, "provider"))
             streamus = Input(
-                prompt = f"\n{cyan} Enter anime name.\n {red}:{reset} ",
-                indent = 0
+                prompt=f"\n{cyan} Enter anime name.\n {red}:{reset} ", indent=0
             )
             streamus.result = streamus.launch()
             streamareyousure = Bullet(
-                prompt = f"{cyan} Are you sure you want to stream {streamus.result}? \n",
-                choices = [
+                prompt=f"{cyan} Are you sure you want to stream {streamus.result}? \n",
+                choices=[
                     f"- {green}Yes",
                     f"- {red}No",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
+                bullet="",
+                margin=0,
+                align=1,
                 word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                background_on_switch=colors.background["white"],
             )
             streamareyousure.result = streamareyousure.launch()
             if streamareyousure.result == f"- {green}Yes":
                 pass
             else:
                 c_m()
-                os.system(f'animdl stream'
-                    f'{specialarg} {rangearg} {qualityarg} "{provider}:{streamus.result}"')
+                os.system(
+                    f"animdl stream"
+                    f'{specialarg} {rangearg} {qualityarg} "{provider}:{streamus.result}"'
+                )
             clear()
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
             locs = Bullet(
-                prompt = f"{cyan} Do you want to leave "
+                prompt=f"{cyan} Do you want to leave "
                 "or"
                 f" do you want to continue streaming?{reset}",
-                choices = [
+                choices=[
                     f"- {green}Continue",
                     f"- {red}Leave",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
+                bullet="",
+                margin=0,
+                align=1,
                 word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                background_on_switch=colors.background["white"],
             )
             locs.result = locs.launch()
             if locs.result == f"- {green}Continue":
@@ -980,29 +826,28 @@ def main():
 
         def search():
             cursor.hide()
-            with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+            with open("config.yml", "r", encoding="utf-8") as configfile_read:
                 tui_config = y.safe_load(configfile_read)
-            provider = tui_config['modifiers']['provider']
+            provider = tui_config["modifiers"]["provider"]
 
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
 
             print(checkiffalse(tui_config, "provider"))
             searchus = Input(
-                prompt = f"{cyan} Enter anime name.\n {red}:{reset} ",
-                indent = 0
+                prompt=f"{cyan} Enter anime name.\n {red}:{reset} ", indent=0
             )
             searchus.result = searchus.launch()
             searchusareyousure = Bullet(
-                prompt = f"{cyan} Are you sure you want to search {searchus.result}? \n",
-                choices = [
+                prompt=f"{cyan} Are you sure you want to search {searchus.result}? \n",
+                choices=[
                     f"- {green}Yes",
                     f"- {red}No",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
+                bullet="",
+                margin=0,
+                align=1,
                 word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                background_on_switch=colors.background["white"],
             )
             searchusareyousure.result = searchusareyousure.launch()
             if searchusareyousure.result == f"- {green}Yes":
@@ -1011,20 +856,20 @@ def main():
                 c_m()
             os.system(f'animdl search -p {provider} "{searchus.result}"')
             clear()
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
             locs = Bullet(
-                prompt = f"{cyan} Do you want to leave "
+                prompt=f"{cyan} Do you want to leave "
                 "or"
                 " do you want to continue searching?{reset}",
-                choices = [
+                choices=[
                     f"- {green}Continue",
                     f"- {red}Leave",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
+                bullet="",
+                margin=0,
+                align=1,
                 word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                background_on_switch=colors.background["white"],
             )
             locs.result = locs.launch()
             if locs.result == f"- {green}Continue":
@@ -1041,7 +886,7 @@ def main():
 
         def schedule():
             cursor.hide()
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
             print(f"{cyan} Schedule: {reset}")
             os.system("animdl schedule")
             continue1()
@@ -1050,29 +895,28 @@ def main():
         def grab():
             cursor.hide()
 
-            with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+            with open("config.yml", "r", encoding="utf-8") as configfile_read:
                 tui_config = y.safe_load(configfile_read)
-            provider = tui_config['modifiers']['provider']
+            provider = tui_config["modifiers"]["provider"]
 
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
 
             print(checkiffalse(tui_config, "provider"))
             grabus = Input(
-                prompt = f"{cyan} Enter anime name.\n {red}:{reset} ",
-                indent = 0
+                prompt=f"{cyan} Enter anime name.\n {red}:{reset} ", indent=0
             )
             grabus.result = grabus.launch()
             grabusareyousure = Bullet(
-                prompt = f"{cyan} Are you sure you want to grab {grabus.result}? \n",
-                choices = [
+                prompt=f"{cyan} Are you sure you want to grab {grabus.result}? \n",
+                choices=[
                     f"- {green}Yes",
                     f"- {red}No",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
+                bullet="",
+                margin=0,
+                align=1,
                 word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                background_on_switch=colors.background["white"],
             )
             grabusareyousure.result = grabusareyousure.launch()
             if grabusareyousure.result == f"- {green}Yes":
@@ -1082,18 +926,18 @@ def main():
             os.system(f'animdl grab "{provider}:{grabus.result}"')
             continue1()
             clear()
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
             locg = Bullet(
-                prompt = f"{cyan} Do you want to leave or do you want to continue grabbing?{reset}",
-                choices = [
+                prompt=f"{cyan} Do you want to leave or do you want to continue grabbing?{reset}",
+                choices=[
                     f"- {green}Continue",
                     f"- {red}Leave",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
+                bullet="",
+                margin=0,
+                align=1,
                 word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                background_on_switch=colors.background["white"],
             )
             locg.result = locg.launch()
             if locg.result == f"- {green}Continue":
@@ -1110,19 +954,19 @@ def main():
 
         def download():
             cursor.hide()
-            with open (ANIMDL_CONFIG, 'r', encoding='utf8') as animdl_config_read:
+            with open("animdl_config.yml", "r", encoding="utf8") as animdl_config_read:
                 animdl_config = y.safe_load(animdl_config_read)
 
-            with open(CONFIG_FILE, 'r', encoding="utf-8") as configfile_read:
+            with open("config.yml", "r", encoding="utf-8") as configfile_read:
                 tui_config = y.safe_load(configfile_read)
 
-            qualityarg = tui_config['modifiers']['quality']
+            qualityarg = tui_config["modifiers"]["quality"]
             rangearg = f"-r {tui_config['modifiers']['range']}"
             specialarg = f"-s {tui_config['modifiers']['special']}"
             directoryarg = f"-d {tui_config['modifiers']['dir']}"
-            provider = tui_config['modifiers']['provider']
+            provider = tui_config["modifiers"]["provider"]
 
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
 
             print(checkiffalse(tui_config, "quality"))
             print(checkiffalse(tui_config, "range"))
@@ -1131,46 +975,47 @@ def main():
             print(checkiffalse(tui_config, "dir"))
             print(checkiffalse(tui_config, "provider"))
             downloadus = Input(
-                prompt = f"{cyan} Enter anime name.\n {red}:{reset} ",
-                indent = 0
+                prompt=f"{cyan} Enter anime name.\n {red}:{reset} ", indent=0
             )
             downloadus.result = downloadus.launch()
             downloadusareyousure = Bullet(
-                prompt = f"{cyan} Are you sure you want to download {downloadus.result}? \n",
-                choices = [
+                prompt=f"{cyan} Are you sure you want to download {downloadus.result}? \n",
+                choices=[
                     f"- {green}Yes",
                     f"- {red}No",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
+                bullet="",
+                margin=0,
+                align=1,
                 word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                background_on_switch=colors.background["white"],
             )
             downloadusareyousure.result = downloadusareyousure.launch()
             if downloadusareyousure.result == f"- {green}Yes":
                 pass
             else:
                 c_m()
-            os.system(f'animdl download'
-                    f'{specialarg} {rangearg} {qualityarg} {directoryarg} '
-                    f'"{provider}:{downloadus.result}"')
+            os.system(
+                f"animdl download"
+                f"{specialarg} {rangearg} {qualityarg} {directoryarg} "
+                f'"{provider}:{downloadus.result}"'
+            )
             continue1()
             clear()
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
             locd = Bullet(
-                prompt = f"{cyan} Do you want to leave "
+                prompt=f"{cyan} Do you want to leave "
                 "or"
                 " do you want to continue downloading?{reset}",
-                choices = [
+                choices=[
                     f"- {green}Continue",
                     f"- {red}Leave",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
+                bullet="",
+                margin=0,
+                align=1,
                 word_on_switch=colors.foreground["default"],
-                background_on_switch=colors.background["white"]
+                background_on_switch=colors.background["white"],
             )
             locd.result = locd.launch()
             if locd.result == f"- {green}Continue":
@@ -1187,80 +1032,82 @@ def main():
 
         def menu():
             cursor.hide()
-            randcolforname(ANIMDL)
+            randcolforname("[animdl-tui]")
             menu = Bullet(
-                prompt = f"{green} Main Menu: {reset} \n",
-                choices = [
-                    '- Download',
-                    '- Stream  ',
-                    '- Search  ',
-                    '- Schedule',
-                    '- Grab    ',
-                    '- Update  ',
-                    '- Settings',
+                prompt=f"{green} Main Menu: {reset} \n",
+                choices=[
+                    "- Download",
+                    "- Stream  ",
+                    "- Search  ",
+                    "- Schedule",
+                    "- Grab    ",
+                    "- Update  ",
+                    "- Settings",
                     #'- Web (WIP/Not Working)',
-                    '- Exit    '
+                    "- Exit    ",
                 ],
-                bullet = "",
-                margin = 0,
-                align = 1,
-                word_on_switch = colors.foreground["default"],
-                background_on_switch = colors.background["cyan"]
+                bullet="",
+                margin=0,
+                align=1,
+                word_on_switch=colors.foreground["default"],
+                background_on_switch=colors.background["cyan"],
             )
 
             menu.result = menu.launch()
 
             match menu.result:
-                case '- Download':
+                case "- Download":
                     clear()
                     download()
-                case '- Stream  ':
+                case "- Stream  ":
                     clear()
                     stream()
-                case '- Search  ':
+                case "- Search  ":
                     clear()
                     search()
-                case '- Schedule':
+                case "- Schedule":
                     clear()
                     schedule()
-                case '- Grab    ':
+                case "- Grab    ":
                     clear()
                     grab()
-                case '- Update  ':
+                case "- Update  ":
                     clear()
                     update()
-                case '- Settings':
+                case "- Settings":
                     clear()
                     thesettings()
-                #case '- Web (WIP/Not Working)':
+                # case '- Web (WIP/Not Working)':
                 #    clear()
                 #    web()
-                case '- Exit    ':
+                case "- Exit    ":
                     clear()
                     sys.exit()
+
         menu()
     except KeyboardInterrupt:
         print("Are you sure you want to exit the terminal? (Y/N)")
         decision = readchar.readchar()
         match decision:
-            case 'y':
+            case "y":
                 sys.exit()
-            case 'n':
+            case "n":
                 continue1()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     clear()
     cursor.hide()
 
-    if checkforadmin() is True:
+    if ctypes.windll.shell32.IsUserAnAdmin():
         ctypes.windll.kernel32.SetConsoleTitleW("animdl-tui - Administrator")
     else:
         ctypes.windll.kernel32.SetConsoleTitleW("animdl-tui")
 
-    checkifexists(ANIMDL_CONFIG, 'x', ANIMDL_DEFAULT)
-    checkifexists(CONFIG_FILE, 'x', CONFIG_DEFAULT)
+    checkifexists("animdl_config.yml", "x", ANIMDL_DEFAULT)
+    checkifexists("config.yml", "x", CONFIG_DEFAULT)
 
-    if checkforadmin() and os.path.isfile("animdl.txt") is True:
+    if ctypes.windll.shell32.IsUserAnAdmin() and os.path.isfile("animdl.txt"):
         with open("animdl.txt", "r", encoding="utf-8") as animdl_signal_read:
             if animdl_signal_read.read() == "animdl installus":
                 os.system("pip install animdl")
@@ -1272,7 +1119,7 @@ if __name__ == '__main__':
     else:
         pass
 
-    if checkforadmin() and os.path.isfile("pypresence.txt") is True:
+    if ctypes.windll.shell32.IsUserAnAdmin() and os.path.isfile("pypresence.txt"):
         with open("pypresence.txt", "r", encoding="utf-8") as pypresence_signal_read:
             if pypresence_signal_read.read() == "pypresence installus":
                 os.system("pip install pypresence")
@@ -1284,7 +1131,7 @@ if __name__ == '__main__':
     else:
         pass
 
-    if checkforadmin() and os.path.isfile("update.txt") is True:
+    if ctypes.windll.shell32.IsUserAnAdmin() and os.path.isfile("update.txt"):
         with open("update.txt", "r", encoding="utf-8") as update_signal_read:
             if update_signal_read.read() == "updatus":
                 os.system("animdl update")
@@ -1296,7 +1143,6 @@ if __name__ == '__main__':
     else:
         pass
 
-
     if doespackageexist("animdl") is True:
         pass
 
@@ -1305,48 +1151,42 @@ if __name__ == '__main__':
         print("Please install it manually or by pressing enter. Thanks")
         continue1()
         if os.path.isfile("animdl.txt") is True:
-            print("Seems like you encountered a bug. Please report it to me on github.com")
+            print(
+                "Seems like you encountered a bug. Please report it to me on github.com"
+            )
         else:
             with open("animdl.txt", "a", encoding="utf-8") as animdl_signal:
                 animdl_signal.write("animdl installus")
                 print("animdl will try to install on next startup of animdl-tui")
             ctypes.windll.shell32.ShellExecuteW(
-                None,
-                "runas",
-                sys.executable,
-                " ".join(sys.argv),
-                None,
-                1
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
             )
 
             sys.exit()
 
-    if doespackageexist("pypresence") is True and ismoduleon(
-        ANIMDL_CONFIG,
-        "discord_presence"
-        ) is True:
+    if (
+        doespackageexist("pypresence") is True
+        and ismoduleon("animdl_config.yml", "discord_presence") is True
+    ):
         pass
 
-    elif doespackageexist("pypresence") is False and ismoduleon(
-        ANIMDL_CONFIG,
-        "discord_presence"
-        ) is True:
+    elif (
+        doespackageexist("pypresence") is False
+        and ismoduleon("animdl_config.yml", "discord_presence") is True
+    ):
         print("Whoops, doesn't look like you have pypresence installed.")
         print("Please install it manually or by pressing enter. Thanks")
         continue1()
         if os.path.isfile("pypresence.txt") is True:
-            print("Seems like you encountered a bug. Please report it to me on github.com")
+            print(
+                "Seems like you encountered a bug. Please report it to me on github.com"
+            )
         else:
             with open("pypresence.txt", "a", encoding="utf-8") as pypresence_signal:
                 pypresence_signal.write("pypresence installus")
                 print("pypresence will try to install on next startup of animdl-tui")
             ctypes.windll.shell32.ShellExecuteW(
-                None,
-                "runas",
-                sys.executable,
-                " ".join(sys.argv),
-                None,
-                1
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
             )
             sys.exit()
     else:
