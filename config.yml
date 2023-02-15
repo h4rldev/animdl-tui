@@ -1,13 +1,19 @@
-modifiers:
-  dir: /
-  provider: animixplay
-  quality: 1080/best
-  range: 1-89
-  special: latest-89
-toggles:
-  dir: false
-  quality: true
-  range: false
-  special: false
-web:
-  web: false
+  dir:
+    status: false
+    path: "/"
+
+  provider:
+    status: true
+    val: animixplay
+
+  quality:
+    status: true
+    val: 1080/best
+
+  range:
+    status: false
+    val: 1-89
+
+  special:
+    status: false
+    val: latest-89
