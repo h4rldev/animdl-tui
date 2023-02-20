@@ -4,15 +4,14 @@ import os
 import random
 import sys
 from pathlib import Path
-
 from time import sleep
 
-from colored import fg, attr
 import cursor
 import readchar
 import yaml as y
 from bullet import Bullet, Input, colors
 from click import clear
+from colored import attr, fg
 
 # colors
 RED    = fg('#FF0000')
@@ -46,31 +45,31 @@ ANIMDL_DEFAULT: dict = {
 }
 
 TUI_DEFAULT: dict = {
-    "provider": {
-        "status": True,
-        "val": "allanime"
+    "skip_main_menu": False,
+
+    "dir": {
+      "status": False,
+      "val": ""
     },
 
     "quality": {
-        "status": True,
-        "val": "1080/best"
-    },
-
-    "dir": {
-        "status": False,
-        "path": ""
+      "status": True,
+      "val": "1080/best"
     },
 
     "range": {
-        "status": False,
-        "val": ""
+      "status": False,
+      "val": "1-89"
     },
 
     "special": {
-        "status": False,
-        "val": ""
+      "status": False,
+      "val": ""
     }
 }
+
+def todo():
+    pass
 
 def confirmation(conf_prompt: str, choice1: str, choice2: str, color1=GREEN, color2=RED) -> bool:
     """Makes a confirmation prompt and returns either true or false based on user choice."""
@@ -101,15 +100,54 @@ def write_to_config(file: str, config, tree: str, key: str, value=""):
     with open(file, "w", encoding="utf-8") as buffer:
         y.dump(config, buffer)
 
+def main_menu() -> int:
+    with open("config.yml", "r", encoding="utf-8") as buffer:
+        tui_config = y.safeload(buffer)
 
-def continue1():
-    """Continue function"""
-    print("\n Press any key to continue")
-    getkey()
+    if tui_config["skip_main_menu"]:
+        return 1
+
+    menu = Bullet(
+        bullet="",
+        prompt=f"{ANIMDL}",
+        choices=[
+            "1. animdl-tui",
+            "2. config",
+            "3. exit"
+        ]
+    )
+    if "1" in menu.launch():
+        return 1
+    elif "2" in menu.launch():
+        return 2
+    else:
+        return 3
+
+def directory():
+    todo()
+
 
 def main():
+    config_dict: dict = {
+        "1. Skip" : directory(),
+        "2. "
+    }
+    
+    
     """main function"""
-    main_menu = Bullet (
+
+    config_menu = Bullet(
+        bullet="",
+        prompt=f"{ANIMDL}",
+        choices=[
+            "1. animdl-tui",
+            "2. config",
+            "3. exit"
+        ]
+    )
+    
+    
+    animdl_menu = Bullet (
         bullet="",
         prompt=f"{ANIMDL}",
         choices=[
@@ -124,7 +162,16 @@ def main():
         shift=2,
         return_index=True
     )
-    main_menu_result = main_menu.launch()
+    
+    if 1 in main_menu():
+        animdl_menu_result = animdl_menu.launch()
+    else:
+        config_menu_result = config_menu.launch()
+
+    match animdl_menu_result:
+        case "1" in animd_menu_result: 
+            download()
+        
 
 if __name__ == "__main__":
     if "win32" in sys.version:

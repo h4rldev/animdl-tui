@@ -1,19 +1,17 @@
-  dir:
-    status: false
-    path: "/"
+skip_main_menu: false
 
-  provider:
-    status: true
-    val: animixplay
+dir:
+  status: false
+  val: "/"
 
-  quality:
-    status: true
-    val: 1080/best
+quality:
+  status: true
+  val: 1080/best
 
-  range:
-    status: false
-    val: 1-89
+range:
+  status: false
+  val: 1-89
 
-  special:
-    status: false
-    val: latest-89
+special:
+  status: false
+  val: latest-89
