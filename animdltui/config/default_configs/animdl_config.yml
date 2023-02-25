@@ -1,5 +1,5 @@
 default_player: mpv
-discord_presence: true
+discord_presence: false
 players:
   mpv:
     executable: mpv

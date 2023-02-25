@@ -1,5 +1,4 @@
 """for administrator powers"""
-import ctypes
 import os
 import random
 import sys
@@ -12,6 +11,9 @@ import yaml as y
 from bullet import Bullet, Input, colors
 from click import clear
 from colored import attr, fg
+
+from animdltui import download, grab, schedule, search, stream, update
+
 
 # colors
 RED    = fg('#FF0000')
@@ -123,27 +125,53 @@ def main_menu() -> int:
     else:
         return 3
 
+def provider():
+    todo()
+
 def directory():
     todo()
 
 
 def main():
-    config_dict: dict = {
-        "1. Skip" : directory(),
-        "2. "
-    }
-    
-    
     """main function"""
+    menu_choices: list = [
+        [
+            "1. animdl-tui",
+            "2. config    ",
+            "3. exit      "
+        ],
+        [
+            "1. Download",
+            "2. Stream  ",
+            "3. Search  ",
+            "4. Schedule",
+            "5. Grab    ",
+            "6. Update  ",
+            "7. Quit    "
+        ]
+    ]
+
+    config_menu_choices: list = [
+        ""   
+    ]
+
+    menu_dict: dict = {
+        {
+            menu_choices[0][0] : animdl_menu(),
+            menu_choices[0][1] : config_menu(),
+            menu_choices[0][2] : sys.exit()
+        },
+        {
+            menu_choices[1][0] : download_menu(),
+            menu_choices[1][1] : stream_menu(),
+            menu_choices[1][2] : search_menu(),
+        }
+    }
 
     config_menu = Bullet(
         bullet="",
         prompt=f"{ANIMDL}",
-        choices=[
-            "1. animdl-tui",
-            "2. config",
-            "3. exit"
-        ]
+        choices=config_menu_choices
     )
     
     
@@ -167,10 +195,6 @@ def main():
         animdl_menu_result = animdl_menu.launch()
     else:
         config_menu_result = config_menu.launch()
-
-    match animdl_menu_result:
-        case "1" in animd_menu_result: 
-            download()
         
 
 if __name__ == "__main__":
