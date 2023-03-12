@@ -1,4 +1,4 @@
-# animdl-tui (currently broken)
+# animdl-tui (undergoing rework)
 
 [![License](https://img.shields.io/github/license/h4rldev/animdl-tui?style=flat-square)](https://github.com/H4rldev/animdl-tui/blob/main/LICENSE)
 
