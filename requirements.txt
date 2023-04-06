@@ -1,4 +1,4 @@
-rebullet = 2.3.5
+rebullet = 2.3.6
 animdl   = 1.7.3
 click    = 8.1.0
 colorama = 0.4.6

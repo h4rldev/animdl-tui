@@ -1,5 +1,7 @@
 import sys
 import subprocess
+import traceback
+import types
 
 """User Access Control for Microsoft Windows Vista and higher.  This is
 only for the Windows platform.
@@ -23,19 +25,18 @@ See L{runAsAdmin} for the main interface.
 
 """
 
-import sys, os, traceback, types
 
 def isUserAdmin():
-    """@return: True if the current user is an 'Admin' whatever that
-    means (root on Unix), otherwise False.
+    """@return: True if the current user is an 'Admin'
 
     Warning: The inner function fails unless you have Windows XP SP2 or
     higher. The failure causes a traceback to be printed and this
     function to return False.
     """
-    
-    if sys.platfrom == 'win32':
+
+    if sys.platfrom == "win32":
         import ctypes
+
         # WARNING: requires Windows XP SP2 or higher!
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
@@ -43,6 +44,7 @@ def isUserAdmin():
             traceback.print_exc()
             print("Admin check failed, assuming not an admin.")
             return False
+
 
 def runAsAdmin(cmdLine=None, wait=True):
     """Attempt to relaunch the current script as an admin using the same
@@ -59,25 +61,25 @@ def runAsAdmin(cmdLine=None, wait=True):
     @WARNING: this function only works on Windows.
     """
 
-    if sys.platform != 'win32':
+    if sys.platform != "win32":
         raise RuntimeError("This function is only implemented on Windows.")
 
     import win32con
     import win32process
     from win32com.shell.shell import ShellExecuteEx
     from win32com.shell import shellcon
-    
+
     python_exe = sys.executable
 
     if cmdLine is None:
         cmdLine = [python_exe] + sys.argv
-    elif type(cmdLine) not in (types.TupleType,types.ListType):
+    elif type(cmdLine) not in (types.TupleType, types.ListType):
         raise ValueError("cmdLine is not a sequence.")
     cmd = '"%s"' % (cmdLine[0],)
     params = " ".join(['"%s"' % (x,) for x in cmdLine[1:]])
     showCmd = win32con.SW_SHOWNORMAL
-    lpVerb = 'runas'  # causes UAC elevation prompt.
-    
+    lpVerb = "runas"  # causes UAC elevation prompt.
+
     # print "Running", cmd, params
 
     # ShellExecute() doesn't seem to allow us to fetch the PID or handle
@@ -86,14 +88,16 @@ def runAsAdmin(cmdLine=None, wait=True):
 
     # procHandle = win32api.ShellExecute(0, lpVerb, cmd, params, cmdDir, showCmd)
 
-    procInfo = ShellExecuteEx(nShow=showCmd,
-                              fMask=shellcon.SEE_MASK_NOCLOSEPROCESS,
-                              lpVerb=lpVerb,
-                              lpFile=cmd,
-                              lpParameters=params)
+    procInfo = ShellExecuteEx(
+        nShow=showCmd,
+        fMask=shellcon.SEE_MASK_NOCLOSEPROCESS,
+        lpVerb=lpVerb,
+        lpFile=cmd,
+        lpParameters=params,
+    )
 
     if wait:
-        procHandle = procInfo['hProcess']    
+        procHandle = procInfo["hProcess"]
         rc = win32process.GetExitCodeProcess(procHandle)
     else:
         rc = None
@@ -101,12 +105,10 @@ def runAsAdmin(cmdLine=None, wait=True):
     return rc
 
 
-
-
 def update():
     if sys.platform in ("linux", "linux2"):
         subprocess.check_output(["animdl update"], shell=True)
-        
+
     else:
         if isUserAdmin():
             subprocess.check_output(["animdl update"], shell=True)
