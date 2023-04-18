@@ -6,12 +6,7 @@ A Terminal User Interface for [animdl](https://github.com/justfoolingaround/anim
 
 (_heck, I had to fork a library and make it better for this_)
 
-(__I WON'T ADD FUZZYFINDER FOR THIS BECAUSE TWIST.MOE IS RANCID__)
-
-## News
-
-The latest version of animdl-tui has been released
-and will probably be the most stable release as of rn.
+(__Will probably rely on fzf or not, depends if i'm lazy__)
 
 > How to run:
 
@@ -28,19 +23,14 @@ Download from the [releases](https://github.com/h4rldev/animdl-tui/releases/late
 Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
 ## Todo
-
-- Code Cleanup
+- Fix the project
 - Less skill issues.
 - Mal/Anilist Sync (If you're downloading only, use [taiga](https://taiga.moe/))
 - Compatibility with other oses
 - animdl rewrite in rust (the funny)
 
 ## Installation
-
-1. Download from the [releases](https://github.com/h4rldev/animdl-tui/releases/latest)
-2. Put the executable anywhere.
-3. Execute the name of the executable in your terminal or make a shortcut.
-4. Profit???
+- (currently empty because I plan on making it install into path)
 
 ## Build/running latest
 
@@ -50,12 +40,6 @@ Please report bugs in [issues](https://github.com/h4rldev/animdl-tui/issues)
 
 ```shell
 python main.py
-```
-
-> Build in the cloned repository:
-
-```shell
-pyinstaller --onefile --icon logo.ico main.py
 ```
 
 ### Directly
@@ -76,7 +60,6 @@ pyinstaller --onefile --icon logo.ico main.py
 - [colored](https://pypi.org/project/colored/)
 - [click](https://pypi.org/project/click/)
 - [rebullet](https://pypi.org/project/rebullet) and dependencies.
-- [pyinstaller](https://pyinstaller.org/en/stable/) (if you want to build from source)
 
 ## Requirements (running)
 
